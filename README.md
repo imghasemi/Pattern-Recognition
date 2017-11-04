@@ -6,7 +6,7 @@ This Repository is created to push the solutions and discuss about it.
 
 ## Group Members
 * Mohammadali Ghasemi
-* Can Yunce
+* Can Yuce
 * Please complete the list of group names here !!!
 
 
