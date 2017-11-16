@@ -1,9 +1,6 @@
-
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
-
-
 
 def plotData2D(X, filename=None):
     # create a figure and its axes
@@ -36,10 +33,6 @@ def plotData2D(X, filename=None):
                     bbox_inches='tight', pad_inches=0.1)
     plt.close()
     
-
-
-
-
 if __name__ == "__main__":
     #######################################################################
     # 1st alternative for reading multi-typed data from a text file
