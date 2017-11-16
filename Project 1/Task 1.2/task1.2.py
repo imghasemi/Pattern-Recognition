@@ -1,96 +1,76 @@
-import csv
-import math
+
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
+from scipy.stats import norm
 
-def estimateOfWeibullDistribution(k, a, D):# k: kappa, a: alpha, D: 1-D data sample
-    N = len(ds)
-    s_log_di = 0
-    s_di_a_k_log_di_a = 0
-    s_di_a_k = 0
-    s_di_a_k_log_di_a_2 = 0
+def plotData2D(data, sigma, mu, filename=None):
+    # create a figure and its axes
+    fig = plt.figure()
+    axs = fig.add_subplot(111)
     
-    for i in range(N):
-        s_log_di += math.log(D[i])
-        s_di_a_k_log_di_a += pow(D[i]/a, k)*math.log(D[i]/a)
-        s_di_a_k += pow(D[i]/a, k)
-        s_di_a_k_log_di_a_2 += pow(D[i]/a, k)*pow(math.log(D[i]/a),2)
-    
-    p_k = N/k - N*math.log(a) + s_log_di - s_di_a_k_log_di_a
-    p_a = k/a*(s_di_a_k-N)
-    p_kk = -N/pow(k,2)-s_di_a_k_log_di_a_2
-    p_aa = k/pow(a,2)*(N-(k+1)*s_di_a_k)
-    p_ka = 1/a*(s_di_a_k) + k/a*(s_di_a_k_log_di_a) - N/a
-    
-    mat = np.matrix([[p_kk, p_ka], [p_ka, p_aa]])
-    inv_mat = np.linalg.inv(mat)
-    
-    new_ka = np.matrix([[k],[a]]) + np.dot(inv_mat, np.matrix([[-p_k], [-p_a]]))
-    return new_ka
+    # plot the data 
+    x_min, x_max = 140, 210
+    x = np.linspace(x_min, x_max, 1000)
+    y = norm.pdf(x, mu, sigma)
+    axs.plot(x, norm.pdf(x, mu, sigma), label='normal')
+    axs.plot(data[:,1], np.zeros_like(data[:,1]), 'ro', markersize=4,
+             label='data',  alpha=0.3)
 
-def testEstimation(p): # check the sum of probability distribution p is 1 or not
-    sum_prob = 0
-    for x in p:
-        sum_prob += x
-    if abs(sum_prob-1) < 0.01:
-        return True
+    # set x and y limits of the plotting area
+    axs.set_xlim(x_min, x_max)
+    axs.set_ylim(0., y.max()+0.01)
+
+    # set properties of the legend of the plot
+    leg = axs.legend(loc='upper right', shadow=True, fancybox=True, numpoints=1)
+    leg.get_frame().set_alpha(0.5)
+            
+    # either show figure on screen or write it to disk
+    if filename == None:
+        plt.show()
     else:
-        print "Estimation test failed"
-        return False
-
+        plt.savefig(filename, facecolor='w', edgecolor='w',
+                    papertype=None, format='pdf', transparent=False,
+                    bbox_inches='tight', pad_inches=0.1)
+    plt.close()
+    
+    
 if __name__ == "__main__":
-    # read data from a .csv file
-    hist = []
-    with open('myspace.csv', 'rb') as csvfile:
-        csv_reader = csv.reader(csvfile) # Note: csv.reader read data line by line
-        
-        # for each row, store non-zero data in the 2nd column into the histogram array
-        for row in csv_reader:
-            n = (int)(row[1])
-            if n > 0:
-                hist.append(n)
-    
-    # compute data sample from the histogram
-    X = len(hist)
-    ds = []
-    for x in range(X):
-        tmp_array = [x+1 for i in range(hist[x])]
-        ds.extend(tmp_array)
-    
-    k = 1.
-    a = 1.
-    for i in range(20):
-        ka = estimateOfWeibullDistribution(k,a,ds)
-        k = np.matrix.item(ka, 0)
-        a = np.matrix.item(ka, 1)
-    
-    # compute probability function using k(kappa) and a(alpha)
-    prob = [0 for x in range(X)]
-    for x in range(X):
-        prob[x] = k/a*pow(x/a, k-1)*math.exp(-pow(x/a, k))
-    
-    if testEstimation(prob) == False:
-        exit()
+    #######################################################################
+    # 1st alternative for reading multi-typed data from a text file
+    #######################################################################
+    # define type of data to be read and read data from file
+    dt = np.dtype([('w', np.float), ('h', np.float), ('g', np.str_, 1)])
+    data = np.loadtxt('whData.dat', dtype=dt, comments='#', delimiter=None)
 
-    # find the scale which makes the area between histogram and a correspondingly scaled version
-    # of the fitted distribution smallest
-    hist_max = max(hist)
-    weibull_max = max(prob)
-    min_sum_value = sys.maxsize
-    min_scale = -1
-    go_less = False;
-    for i in xrange(int(hist_max/weibull_max), 0, -1):
-        sum_value = 0
-        for j in range(X):
-            sum_value += abs(hist[j]-i*prob[j])
-        if (min_sum_value > sum_value):
-            min_scale = i
-            min_sum_value = sum_value
-            go_less = True
-        if (go_less==True and min_sum_value<sum_value):
-            break
+    # read height, weight and gender information into 1D arrays
+    ws = np.array([d[0] for d in data])
+    hs = np.array([d[1] for d in data])
+    gs = np.array([d[2] for d in data]) 
+    
+    # Task 1.1
+    outlierInd = np.where( ws != -1 ) 
+    ws, hs, gs = ws[outlierInd], hs[outlierInd], gs[outlierInd]
 
-    plt.plot(hist)
-    plt.plot(min_scale*np.array(prob))
-    plt.show()
+    ##########################################################################
+    # 2nd alternative for reading multi-typed data from a text file
+    ##########################################################################
+    # read data as 2D array of data type 'object'
+    data = np.loadtxt('whData.dat',dtype=np.object,comments='#',delimiter=None)
+
+    # read height and weight data into 2D array (i.e. into a matrix)
+    X = data[:,0:2].astype(np.float)
+
+    # read gender data into 1D array (i.e. into a vector)
+    y = data[:,2]
+    
+    # Task 1.1
+    outlierInd = np.where( X[:,0] != -1 ) 
+    X, y = X[outlierInd], y[outlierInd]
+    
+    # Stat. of students
+    sigma = np.std(X[:,1])
+    mu = np.mean(X[:,1])
+
+    # now, plot weight vs. height using the function defined above
+    plotData2D(X, sigma, mu, 'plotNormal.pdf')
+
