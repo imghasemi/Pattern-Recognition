@@ -152,4 +152,3 @@ if __name__ == "__main__":
     s, count = boxcounting(g)
     D, b = linefitting(s, count)
     print "slope D = " + str(D)
-
