@@ -7,12 +7,16 @@ import math
 import matplotlib.pyplot as plt
 
 
-def newtonParameterCalculator(k, a, histogramData):
+# from PartialDifferentialEqSolver import PDESolver as PDFS
+
+
+def newtonParametersCalculator(k, a, histogramData):
     # We Input parameters 'k' and 'a' (alpha) into the function.
     N = len(histogramData)
 
     # Calculated all the matrix elements of the Newtonian Method.
-    B1 = N / k - N * math.log(a) + np.sum(np.log(histogramData)) - np.sum(((histogramData / a) ** k) * np.log(histogramData / a))
+    B1 = N / k - N * math.log(a) + np.sum(np.log(histogramData)) - np.sum(
+        ((histogramData / a) ** k) * np.log(histogramData / a))
     B2 = (k / a) * (np.sum((histogramData / a) ** k) - N)
     M11 = -N / (k ** 2) - np.sum(((histogramData / a) ** k) * (np.log(histogramData / a)) ** 2)
     M22 = (k / ((a) ** 2)) * (N - (k + 1) * np.sum((histogramData / a) ** k))
@@ -32,7 +36,7 @@ def iterationFunction(k, a, n, histogram):
     # we can specify a tolerance value)
     oldParameters = np.array([k, a])
     for i in range(n):
-        newParameters = newtonParameterCalculator(oldParameters[0], oldParameters[1], histogram)
+        newParameters = newtonParametersCalculator(oldParameters[0], oldParameters[1], histogram)
         oldParameters = newParameters
     return newParameters
 
@@ -49,11 +53,11 @@ if __name__ == "__main__":
     xValues = np.arange(1, len(h) + 1)
 
     # Data generation for Newton's Method.
-    histrogramOfX = [];
+    histogramOfX = [];
     for i in range(len(h)):
-        histrogramOfX = np.append(histrogramOfX, [xValues[i]] * int(h[i]))
+        histogramOfX = np.append(histogramOfX, [xValues[i]] * int(h[i]))
 
-    parameters = iterationFunction(1, 1, 20, histrogramOfX);
+    parameters = iterationFunction(1, 1, 20, histogramOfX);
     k = parameters[0];
     a = parameters[1];
 
