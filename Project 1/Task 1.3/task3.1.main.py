@@ -24,6 +24,7 @@ def newtonParametersCalculator(k, a, histogramData):
         ((histogramData / a) ** k) * np.log(histogramData / a)) - N / a
     return \
         np.array(
+
             np.matmul(np.linalg.inv(np.matrix([[M11, M12], [M21, M22]])), np.array([-B1, -B2])) + np.array([k, a]))[0]
 
 
@@ -64,7 +65,8 @@ if __name__ == "__main__":
     plt.plot(xValues, h)
     plt.axis([xValues[0], xValues[len(xValues) - 1], 0, max(h) + 10])
 
-    # Scaling factor for the Weibull fit was derived by setting: scale_factor*integral[Weibull] = Area Under the Curve for Histogram
+    # Scaling factor for the Weibull fit was derived by setting: scale_factor*integral[Weibull] = Area Under the
+    # Curve for Histogram
     plt.plot(sum(h) * (k / a) * ((xValues / a) ** (k - 1)) * np.exp(-1 * ((xValues / a) ** k)), 'r')
     plt.legend(('Google Data', 'Scaled Weibull Fit'))
     plt.show()
