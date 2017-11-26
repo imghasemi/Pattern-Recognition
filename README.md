@@ -11,6 +11,7 @@ This Repository is created to push the solutions and discuss about it.
 * Mohammadali Ghasemi
 * Can Yuce
 * Chu-I Chao
+* Neng Qian
 * Please complete the list of group names here !!!
 
 
