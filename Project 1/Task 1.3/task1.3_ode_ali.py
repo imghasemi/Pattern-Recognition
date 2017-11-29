@@ -37,4 +37,3 @@ def weib(x, k, a):
 
 plt.plot(x, weib(x, res_kappa, res_alpha))
 plt.show()
-print(res_alpha, res_kappa)
