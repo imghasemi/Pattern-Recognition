@@ -6,39 +6,39 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+# read data from file
+h = np.genfromtxt('myspace.csv', delimiter=",")[:, 1]
+while h[0] == 0:
+    h = np.delete(h, 0)
+N = int(np.sum(h))
+# Generate x-Values for the histogram
+xValues = np.arange(1, len(h) + 1, dtype='float')
 
-def newtonParametersCalculator(k, a, histogramData):
-    # We Input parameters 'k' and 'a' (alpha) into the function.
-    N = len(histogramData)
-    sum_log_di = np.sum(np.log(histogramData))
-    sum_di_a_k = np.sum((histogramData / a) ** k)
 
-    # Calculate all the matrix elements of the Newtonian Method.
-    dl_dk = N / k - N * math.log(a) + sum_log_di - np.sum(
-        ((histogramData / a) ** k) * np.log(histogramData / a))
+def newtonParametersCalculator(k, a):
+    # Constant calculation are done here
+    sum_log_di = np.sum(h * np.log(xValues))
+    sum_di_a_k = np.sum(h * (xValues / a) ** k)
+
+    # In General the the computation of sum is 1 (differs based on the OS and CPU Arch ect.) and multiplying cost 4.
+    # Instead of summing nearly 17000 summation = O(1700) we multiply (xPoint X h) which means that it
+    # only costs 450X4 = 1800 which is
+    # nearly 10 times faster than working with histogram
+    dl_dk = N / k - N * np.log(a) + sum_log_di - np.sum(h * ((xValues / a) ** k) * np.log(xValues / a))
     dl_da = (k / a) * (sum_di_a_k - N)
-    d2l_dk = -N / (k ** 2) - np.sum(((histogramData / a) ** k) *
-                                    (np.log(histogramData / a)) ** 2)
-    d2l_da = (k / ((a) ** 2)) * (N - (k + 1) * sum_di_a_k)
-    d2l_dkda = M21 = (1 / a) * sum_di_a_k + (k / a) * np.sum(
-        ((histogramData / a) ** k) * np.log(histogramData / a)) - N / a
+    d2l_dk = -N / (k ** 2) - np.sum(h * ((xValues / a) ** k) * (np.log(xValues / a)) ** 2)
+    d2l_da = (k / (a ** 2)) * (N - (k + 1) * sum_di_a_k)
+    d2l_dkda = (1 / a) * sum_di_a_k + (k / a) * np.sum(h * ((xValues / a) ** k) * np.log(xValues / a)) - N / a
 
-    return np.array(np.matmul(np.linalg.inv(np.matrix([[d2l_dk, d2l_dkda],
-                                                       [d2l_dkda, d2l_da]])), np.array([-dl_dk, -dl_da])) +
-                    np.array([k, a]))[0]
+    return np.array(np.matmul(np.linalg.inv(np.matrix([[d2l_dk, d2l_dkda], [d2l_dkda, d2l_da]])),
+                              np.array([-dl_dk, -dl_da])) + np.array([k, a]))[0]
 
 
-def iterationFunction(k, a, n, histogram):
-    # Normally, a termination condition could also be specified, but since we
-    # have observed that 'k' and 'a' converge in 20 iterations, no termination 
-    # condition is specified.
-
-    # Termination condition could be of the form while newParam!=oldParam
-    # (If they don't terminate exactly, we can specify a tolerance value)
+def iterationFunction(k, a, n):
+    # 20 iterations, no termination
     oldParameters = np.array([k, a])
     for i in range(n):
-        newParameters = newtonParametersCalculator(oldParameters[0],
-                                                   oldParameters[1], histogram)
+        newParameters = newtonParametersCalculator(oldParameters[0], oldParameters[1])
         oldParameters = newParameters
     return newParameters
 
@@ -59,19 +59,16 @@ if __name__ == "__main__":
     for i in range(len(h)):
         histogramOfX = np.append(histogramOfX, [xValues[i]] * int(h[i]))
 
-    parameters = iterationFunction(1, 1, 20, histogramOfX);
-    k = parameters[0];
-    a = parameters[1];
+    parameters = iterationFunction(1, 1, 20)
+    k = parameters[0]
+    a = parameters[1]
     filename = "fit_newton.pdf"
 
     # plot fitted distribution with observed samples
-    plt.plot(xValues, h)
+    plt.plot(xValues, h, 'k')
     plt.axis([xValues[0], xValues[len(xValues) - 1], 0, max(h) + 10])
 
-    # Scaling factor for the Weibull fit was derived by setting:
-    # scale_factor*integral[Weibull] = Area Under the curve for Histogram
-    plt.plot(sum(h) * (k / a) * ((xValues / a) ** (k - 1)) * np.exp(-1 *
-                                                                    ((xValues / a) ** k)), 'r')
+    plt.plot(sum(h) * (k / a) * ((xValues / a) ** (k - 1)) * np.exp(-1 * ((xValues / a) ** k)), 'r')
     plt.legend(('Google Data', 'Scaled Weibull Fit(Newton)'))
 
     plt.savefig(filename, facecolor='w', edgecolor='w', papertype=None,

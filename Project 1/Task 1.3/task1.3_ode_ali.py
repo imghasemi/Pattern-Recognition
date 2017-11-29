@@ -34,6 +34,7 @@ res_alpha, res_kappa = y[-1, :]
 def weib(x, k, a):
     return (k / a) * (x / a) ** (k - 1) * np.exp(-(x / a) ** k)
 
+print("K: ",res_kappa," Alpha: ",res_alpha)
 
 plt.plot(x, weib(x, res_kappa, res_alpha))
 plt.show()
