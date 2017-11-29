@@ -7,9 +7,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+# define symbolic constants
 x = Symbol('x', real = True)
 y = Symbol('y', real = True)
 
+# solve the norm equation 
 y_ = solve(np.abs(x)**(0.5) + np.abs(y)**(0.5) - 1.0, y)
 x_ = np.linspace(-1,1,1000)
 
@@ -18,6 +20,7 @@ fig = plt.figure()
 axs = fig.add_subplot(111)
 
 for y__ in y_:
+    # lambdify the solutions
     f = lambdify(x, y__)
     f_x = f(x_)
     axs.plot(x_, f_x, 'b', )
