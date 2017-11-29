@@ -5,8 +5,8 @@ import timeit as t
 
 """
 Here we took the part of formula which we tried to optimize.
-The no_optimisation function calculates the formula before optimisations.
-The optimisation function calculates the formula after optimisations.
+The dl_dk_init function calculates the formula before optimisations.
+The dl_dk_optimised function calculates the formula after optimisations.
 """
 
 
@@ -39,14 +39,14 @@ if __name__ == '__main__':
     sum_log_di = np.sum(h * np.log(xValues))
 
     before = t.timeit('dl_dk_init(N, k, a, sum_log_di, histogramOfX)',
-                   setup='from __main__ import dl_dk_init, N, k, a, '
-                         'sum_log_di, histogramOfX',
-                   number=number_of_test)/float(number_of_test)
+                        setup='from __main__ import dl_dk_init, N, k, a, '
+                        'sum_log_di, histogramOfX',
+                        number=number_of_test)/float(number_of_test)
 
     after = t.timeit('dl_dk_optimised(N, k, a, sum_log_di, xValues)',
-                    setup='from __main__ import dl_dk_optimised, N, k, a, '
-                          'sum_log_di, xValues',
-                    number=number_of_test)/float(number_of_test)
+                        setup='from __main__ import dl_dk_optimised, N, k, a, '
+                        'sum_log_di, xValues',
+                        number=number_of_test)/float(number_of_test)
     print('Test numbers: %s ' % number_of_test)
     print('average time for summations '
           '(approach without optimisation):\n%1.20f' % before)
