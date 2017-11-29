@@ -13,7 +13,7 @@ This Repository is created to push the solutions and discuss about it.
 * Chu-I Chao
 * Neng Qian
 * Valeriia Volkovaia
-
+* Vanik Karslian
 
 
 ## Useful links
