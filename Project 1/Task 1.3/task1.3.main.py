@@ -22,9 +22,6 @@ def newtonParametersCalculator(k, a):
     sum_log_di = np.sum(h * np.log(xValues))
     sum_di_a_k = np.sum(h * (xValues / a) ** k)
 
-    # In General the the computation of sum is 1 (differs based on the OS and CPU Arch ect.) and multiplying cost 4.
-    # Instead of summing nearly 17000 summation = O(1700) we multiply (xPoint X h) which means that it
-    # only costs 450X4 = 1800 which is
     # nearly 10 times faster than working with histogram
     dl_dk = N / k - N * np.log(a) + sum_log_di - np.sum(h * ((xValues / a) ** k) * np.log(xValues / a))
     dl_da = (k / a) * (sum_di_a_k - N)
@@ -35,7 +32,6 @@ def newtonParametersCalculator(k, a):
     return np.array(np.matmul(np.linalg.inv(np.matrix([[d2l_dk, d2l_dkda], [d2l_dkda, d2l_da]])),
                               np.array([-dl_dk, -dl_da])) + np.array([k, a]))[0]
 
-
 def iterationFunction(k, a, n):
     # 20 iterations, no termination
     oldParameters = np.array([k, a])
@@ -43,7 +39,6 @@ def iterationFunction(k, a, n):
         newParameters = newtonParametersCalculator(oldParameters[0], oldParameters[1])
         oldParameters = newParameters
     return newParameters
-
 
 if __name__ == "__main__":
     # read data from file
