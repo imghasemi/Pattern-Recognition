@@ -5,6 +5,8 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import time
+start_time = time.time()
 
 # read data from file
 h = np.genfromtxt('myspace.csv', delimiter=",")[:, 1]
@@ -75,3 +77,5 @@ if __name__ == "__main__":
                 format='pdf', transparent=False, bbox_inches='tight',
                 pad_inches=0.1)
     plt.close()
+    print("--- %s seconds ---" % (time.time() - start_time))
+
