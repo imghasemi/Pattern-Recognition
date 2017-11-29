@@ -19,7 +19,10 @@ def plotData2D(data, sigma, mu, filename=None):
     # set x and y limits of the plotting area
     axs.set_xlim(x_min, x_max)
     axs.set_ylim(0., y.max()+0.01)
-
+    
+    plt.xlabel('Height')
+    plt.ylabel(r'$f(h;\mu,\sigma^2)$')
+    
     # set properties of the legend of the plot
     leg = axs.legend(loc='upper right', shadow=True, fancybox=True, numpoints=1)
     leg.get_frame().set_alpha(0.5)
@@ -63,14 +66,14 @@ if __name__ == "__main__":
     # read gender data into 1D array (i.e. into a vector)
     y = data[:,2]
     
-    # Task 1.1
-    outlierInd = np.where( X[:,0] != -1 ) 
-    X, y = X[outlierInd], y[outlierInd]
+    # Uncomment while estimating weight distribution
+    #outlierInd = np.where( X[:,0] != -1 ) 
+    #X, y = X[outlierInd], y[outlierInd]
     
     # Stat. of students
     sigma = np.std(X[:,1])
     mu = np.mean(X[:,1])
 
     # now, plot weight vs. height using the function defined above
-    plotData2D(X, sigma, mu, 'plotNormal.pdf')
+    plotData2D(X, sigma, mu, 'plotNormal_Height.pdf')
 

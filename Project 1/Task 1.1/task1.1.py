@@ -2,17 +2,19 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
-def plotData2D(X, filename=None):
+def plotData2D(X, filename=None, axis=['Weight', 'Height']):
     # create a figure and its axes
     fig = plt.figure()
     axs = fig.add_subplot(111)
 
     # see what happens, if you uncomment the next line
     # Ans: same scaling from data to plot units for x and y
-    axs.set_aspect('equal')
+    #axs.set_aspect('equal')
     
     # plot the data 
     axs.plot(X[0,:], X[1,:], 'ro', label='data', alpha=0.4)
+    plt.xlabel(axis[0])
+    plt.ylabel(axis[1])
 
     # set x and y limits of the plotting area
     xmin = X[0,:].min()
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     X = X.T
 
     # now, plot weight vs. height using the function defined above
-    plotData2D(X, 'plotWH_equal_aspect_ratio.pdf')
+    plotData2D(X, 'plotWH.pdf', ['Weight', 'Height'])
 
     # next, let's plot height vs. weight 
     # first, copy information rows of X into 1D arrays
@@ -81,4 +83,4 @@ if __name__ == "__main__":
     Z = np.vstack((h,w))
 
     # third, plot this new representation of the data
-    plotData2D(Z, 'plotHW_equal_aspect_ratio.pdf')
+    plotData2D(Z, 'plotHW.pdf', ['Height', 'Weight'])
