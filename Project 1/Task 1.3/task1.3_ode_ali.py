@@ -5,6 +5,8 @@
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
+import time
+start_time = time.time()
 
 arr = np.genfromtxt('myspace.csv', delimiter=",")[:, 1]
 
