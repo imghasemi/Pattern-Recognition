@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import pi
 
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+
+
 
 def pdf(w, h, s_w, s_h, m_w, m_h, ro):
     Q = ((w - m_w) / s_w) ** 2 \
@@ -11,42 +16,53 @@ def pdf(w, h, s_w, s_h, m_w, m_h, ro):
     2 * pi * s_w * s_h * np.sqrt(1 - ro ** 2))
 
 
+def plot_distribution(w, h, s_w, s_h, m_w, m_h, ro):
+    x_span = 0.1*(np.max(w)-np.min(w))
+    y_span = 0.1*(np.max(h)-np.min(h))
+    x = np.arange(np.min(w)-x_span, np.max(w)+x_span, 0.1)
+    y = np.arange(np.min(h)-y_span, np.max(h)+y_span, 0.1)
+    x, y = np.meshgrid(x, y)
+    z = pdf(x, y, s_w, s_h, m_w, m_h, ro)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    surf = ax.plot_surface(x, y, z,
+                           cmap=cm.coolwarm,
+                           linewidth=0,
+                           antialiased=False)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.05f'))
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.show()
+
 def main():
     dt = np.dtype([('weight', np.int), ('height', np.int), ('sex', np.str_, 1)])
     d = np.loadtxt(fname='whData.dat', comments='#', dtype=dt)
     # remove outlayers
     d = d[np.where(d['weight'] >= 0)]
-    # TODO: remove this
-    for i in d:
-        print(i)
-    plt.figure(1)
-    plt.plot(np.arange(6), np.ones(6))
-    plt.show()
+    w = np.array(d['weight'])
+    h = np.array(d['height'])
+
     # mean of weight
-    mw = np.mean(d['weight'])
+    w_mean = np.mean(w)
 
     # mean of height
-    mh = np.mean(d['height'])
-    print(mw, mh)
-
-    weight = np.array(d['weight'])
-    height = np.array(d['height'])
+    h_mean = np.mean(h)
+    print(w_mean, h_mean)
 
     # deviation of weight
-    sw = np.sqrt(np.sum((weight - mw) ** 2) / float(len(weight)))
+    s_w = np.sqrt(np.sum((w - w_mean) ** 2) / float(len(w)))
     # deviation of height
-    sh = np.sqrt(np.sum((height - mh) ** 2) / float(len(height)))
-    print('sigma weight: %s, sigma height: %s' % (sw, sh))
+    s_h = np.sqrt(np.sum((h - h_mean) ** 2) / float(len(h)))
+    print('sigma weight: %s, sigma height: %s' % (s_w, s_h))
 
-    w_h = np.array([weight, height])
-    cov = np.cov(w_h)
-    # print(cov[0][0]**2+cov[0][1]**2, np.sqrt(cov[0][0]**2+cov[0][1]**2))
-    # print(cov[1][0]**2+cov[1][1]**2, np.sqrt(cov[1][0]**2+cov[1][1]**2))
-    # print(sw**2)
-    # print(sh**2)
-
-    print(cov)
-    ro = (cov[0][0] * cov[1][0] + cov[0][1] * cov[1][1]) / (sw * sh)
+    # covariance matrix 2x2
+    cov = np.cov(np.array([w, h]))
+    # covariance between array x and array y
+    cov_w_h = cov[0][1]
+    # correlation coefficient
+    ro = cov_w_h / (s_w * s_h)
+    plot_distribution(w, h, s_w, s_h, w_mean, h_mean, ro)
 
 
 if __name__ == '__main__':
