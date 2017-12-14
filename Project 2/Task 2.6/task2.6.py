@@ -12,14 +12,14 @@ import time
 train_f = "data2-train.dat"
 test_f  = "data2-test.dat"
 
-#   split_method: determines how to compute the split point
-#           'midpoint': split at the midpoint of the data
-#           'median': split at the median of the data
+# split_method: determines how to compute the split point
+#   'midpoint': split at the midpoint of the data
+#   'median': split at the median of the data
 split_method='median'
 
 #   sel_method: determines how to select the splitting dimension
-#           'alternate': alternate between the x and  the y dimension 
-#           'variance': split the data along the dimension of higher variance.
+#       'alternate': alternate between the x and  the y dimension 
+#       'variance': split the data along the dimension of higher variance.
 sel_method='alternate'
 
 class Node:
@@ -70,7 +70,7 @@ def kd_tree(data, depth, frame_coord):
         split_label = d_sorted[split_ind, 2]
     # TODO : midpoint split method
     elif split_method == 'midpoint':
-        mid_p = (d_sorted[:,d][0]+d_sorted[:,d][-1])/2
+        mid_p = (d_sorted[:,d][0] + d_sorted[:,d][-1]) / 2
         split_label = -1 # no split labels when midpoint split is used
         split_ind=np.min(np.where(d_sorted[:,d] >= mid_p))
 
@@ -83,7 +83,6 @@ def kd_tree(data, depth, frame_coord):
            
     # divides horizontally/vertically 
     r_1, r_2, fc_1, fc_2 = None, None, None, None
-        
     # horizontal or vertical split?
     if d == 0:     
         # rectangle coordinates(will help while plotting the tree splits)
@@ -196,7 +195,7 @@ def print_kdtree(root, data, scatter=True, level=range(1,5), returnPlt=False,
         
         plot_tree(root, axs, i)
         
-        # either show figure on screen or write it to disk
+        # return plot and/or write it to disk
         if returnPlt:
             return axs
         if save:
@@ -248,7 +247,7 @@ def kd_tree_search(root, test_data, save=False):
             c_dist = (b_node.x-s[0])**2 + (b_node.y-s[1])**2
             
             # if distance to the parent node/head node on the stack is less
-            # than distance to the current best point
+            # than distance to the current best point, then do update
             if c_dist < b_dist:
                 b_node = c_node
                 b_dist = c_dist
@@ -260,7 +259,8 @@ def kd_tree_search(root, test_data, save=False):
                 c_dist = (c_node.y-s[1])**2
             
             # if distance to split plane is less than distance to the 
-            # current best point
+            # current best point, then check child nodes on the other side of
+            # the plane.
             if c_dist < b_dist:
                 if c_node.split_dim == 0:
                     if s[0] < c_node.x: # traverse right child
@@ -280,7 +280,7 @@ def kd_tree_search(root, test_data, save=False):
             axs = print_kdtree(root, test_data, False, range(5,6), True, False)
             x = b_node.x
             y = b_node.y
-            # draw point
+            # draw train/test points
             axs.plot([x], [y], marker='o', markersize=3, color="red"
                  if b_node.label==1 else "blue" )
             axs.plot([s[0]], [s[1]], marker='+', markersize=5, color="red" 
