@@ -11,7 +11,15 @@ import time
 # train and test file str
 train_f = "data2-train.dat"
 test_f  = "data2-test.dat"
+
+#   split_method: determines how to compute the split point
+#           'midpoint': split at the midpoint of the data
+#           'median': split at the median of the data
 split_method='median'
+
+#   sel_method: determines how to select the splitting dimension
+#           'alternate': alternate between the x and  the y dimension 
+#           'variance': split the data along the dimension of higher variance.
 sel_method='alternate'
 
 class Node:
@@ -19,7 +27,7 @@ class Node:
     # params: 
     #   x, y, label: x, y coordinates and label of the split
     #   l_child, r_child: left and right children of the node
-    # 
+    #   split_dim : dimension of the split(0: vertical, 1:horizontal)
     #   r1, r2: left and right rectangles that the nodes split
     #   r_1 : arr[x,y,width, height]
     #   r_2 : arr[x,y,width, height]
@@ -34,15 +42,10 @@ class Node:
         self.r_1 = r_1
         self.r_2 = r_2       
 
-# construct the tree in recursive fashion
+# Constructs tree in recursive fashion
+#   data: train/test data
 #   depth : current depth in the tree
 #   frame_coord: frame coordinates of the current cell
-#   sel_method: determines how to select the splitting dimension
-#           'alternate': alternate between the x and  the y dimension 
-#           'variance': split the data along the dimension of higher variance.
-#   split_method: determines how to compute the split point
-#           'midpoint': split at the midpoint of the data
-#           'median': split at the median of the data
 def kd_tree(data, depth, frame_coord):
     global k
     
@@ -65,6 +68,7 @@ def kd_tree(data, depth, frame_coord):
         split_x = d_sorted[split_ind, 0]
         split_y = d_sorted[split_ind, 1]
         split_label = d_sorted[split_ind, 2]
+    # TODO : midpoint split method
     elif split_method == 'midpoint':
         mid_p = (d_sorted[:,d][0]+d_sorted[:,d][-1])/2
         split_label = -1 # no split labels when midpoint split is used
@@ -80,6 +84,7 @@ def kd_tree(data, depth, frame_coord):
     # divides horizontally/vertically 
     r_1, r_2, fc_1, fc_2 = None, None, None, None
         
+    # horizontal or vertical split?
     if d == 0:     
         # rectangle coordinates(will help while plotting the tree splits)
         r_1 = [frame_coord[0], frame_coord[2], split_x-frame_coord[0],
@@ -104,6 +109,7 @@ def kd_tree(data, depth, frame_coord):
                 kd_tree(d_sorted[split_ind+1:,:], depth+1, fc_2),
                         r_1, r_2)
 
+# reads first and second column data and labels from the given structured file
 def read_file(file_name): 
     # read data as 3D array of data type 'object'
     data = np.loadtxt(file_name, dtype=np.object, comments='#', delimiter=None)
@@ -160,6 +166,10 @@ def plot_tree(root, axs, depth):
                
 # traverses and plots the tree
 # root: root of the constructed tree
+# scatter: scatter given data on the the plot
+# level: prints tree in levels specified by range
+# returnPlt: return axis for further drawing
+# save: save tree plot to the disk        
 def print_kdtree(root, data, scatter=True, level=range(1,5), returnPlt=False, 
                  save=True):
         
@@ -196,8 +206,10 @@ def print_kdtree(root, data, scatter=True, level=range(1,5), returnPlt=False,
                         bbox_inches='tight', pad_inches=0.1)
         plt.close()
     
-# traverses the tree and pushes visited nodes into a stack 
+# traverses the tree and pushes visited nodes into a stack(used in search)
 #   root : root node
+#   data : test data
+#   stack: stack storing parent nodes(used in search)
 def traverse_tree(root, data, stack):
     
     if root != None:
@@ -216,8 +228,10 @@ def traverse_tree(root, data, stack):
         elif root.y <= data[1]:
             traverse_tree(root.r_child, data, stack)         
     
-# infer labels on the generated kd_tree
-def kd_tree_inference(root, test_data, save=False):
+# search/inference using the generated kd_tree
+# test_data: data to be searched in the tree
+# save: save plots to the disk
+def kd_tree_search(root, test_data, save=False):
     node_stack = []
     bench_m = np.zeros(len(test_data))
     
@@ -278,6 +292,7 @@ def kd_tree_inference(root, test_data, save=False):
                         bbox_inches='tight', pad_inches=0.1)
             plt.close()
     if save:
+        # plot overall run time for computing
         fig = plt.figure()
         axs = fig.add_subplot(111)
         x = np.linspace(0, len(bench_m), len(test_data))
@@ -292,10 +307,13 @@ def kd_tree_inference(root, test_data, save=False):
         plt.close()
             
 if __name__ == "__main__":   
+    # tree generation
     train_data = read_file(train_f)
     root = generate_kdtree(train_data)
     print_kdtree(root, train_data, range(1,5), returnPlt=False, save=True)
+    
+    # test
     test_data = read_file(test_f)
-    kd_tree_inference(root, test_data, save=True)
+    kd_tree_search(root, test_data, save=False)
     
     
