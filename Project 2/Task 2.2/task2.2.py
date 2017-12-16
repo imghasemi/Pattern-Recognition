@@ -30,8 +30,8 @@ def plot_w_h(w, h, filename='w_h.png', w_=None, h_=None):
 
 
 def plot_bi_variate_distribution(w, h, s_w, s_h, m_w, m_h, ro, filename):
-    x_span = 0.1*(np.max(w)-np.min(w))
-    y_span = 0.1*(np.max(h)-np.min(h))
+    x_span = 0.5*(np.max(w)-np.min(w))
+    y_span = 0.5*(np.max(h)-np.min(h))
     x = np.arange(np.min(w)-x_span, np.max(w)+x_span, 0.1)
     y = np.arange(np.min(h)-y_span, np.max(h)+y_span, 0.1)
     x, y = np.meshgrid(x, y)
@@ -69,7 +69,7 @@ def main():
 
     # mean of height
     h_mean = np.mean(h)
-    print(w_mean, h_mean)
+    print('means of weight and height: %s, %s' % (w_mean, h_mean))
 
     # deviation of weight
     s_w = np.sqrt(np.sum((w - w_mean) ** 2) / float(len(w)))
@@ -84,15 +84,16 @@ def main():
 
     # covariance between array x and array y
     cov_w_h = cov[0][1]
+    print('covariance of w and h: %s' % cov_w_h)
     # correlation coefficient
     ro = cov_w_h / (s_w * s_h)
-    print('ro = %s' % ro)
-    plot_w_h(w, h, 'filtered weight and height (no outliers)', 'w_h.png')
-    # plot_bi_variate_distribution(w, h, s_w, s_h, w_mean, h_mean, ro,
-    #                              'bi_variate_distr.png')
+    print('ro : %s' % ro)
+    plot_w_h(w, h, 'w_h.png')
+    plot_bi_variate_distribution(w, h, s_w, s_h, w_mean, h_mean, ro,
+                                 'bi_variate_distr.png')
     # predict missed weights
     w_ = w_mean + (ro * (h_-h_mean))/(s_w/s_h)
-    print('predicted weights: %s ' % w_)
+    print('predicted weights: %s \nfor heights: %s' % (w_, h_))
     plot_w_h(w, h, 'filled_missings.png', w_, h_)
 
 
