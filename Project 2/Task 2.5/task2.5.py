@@ -40,11 +40,11 @@ def findNN(_testPoint, _trainingData, _k):
     return -1. if c1 > c2 else 1.
     
 if __name__ == "__main__":
-    startTime = time.clock()
     trainingData = np.loadtxt('data2-train.dat')
     testData = np.loadtxt('data2-test.dat')
 
     for k in xrange(1,7,2):
+        startTime = time.clock()
         accuracy = kNN(testData, trainingData, k)
         print "k =", k, ", accuracy =", accuracy
-    print "runtime =", time.clock()-startTime, "s"
+        print "runtime =", time.clock()-startTime, "s"
