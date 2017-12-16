@@ -46,5 +46,4 @@ if __name__ == "__main__":
     for k in xrange(1,7,2):
         startTime = time.clock()
         accuracy = kNN(testData, trainingData, k)
-        print "k =", k, ", accuracy =", accuracy
-        print "runtime =", time.clock()-startTime, "s"
+        print "k =", k, ", accuracy =", accuracy, ", runtime =", time.clock()-startTime, "s"
