@@ -9,12 +9,12 @@ import time
 #   _k: use k nearest neighors to vote for the label
 # Return:
 #   the accuracy of our label prediction
-def kNN(_testData, _trainingData, _k):
+def kNN(testData, trainingData, k):
     numOfRightPredict = 0.
-    nd = _testData[:,0].size
+    nd = testData[:,0].size
     for i in xrange(nd):
-        label = findNN(_testData[i], _trainingData, _k)
-        if np.isclose(label, _testData[i][2]):
+        label = findNN(testData[i], trainingData, k)
+        if np.isclose(label, testData[i][2]):
             numOfRightPredict += 1
     return numOfRightPredict/nd
 
@@ -26,14 +26,14 @@ def kNN(_testData, _trainingData, _k):
 #   _k: use k nearest neighors to vote for the label
 # Return:
 #   the predicted label of the given single test data
-def findNN(_testPoint, _trainingData, _k):
+def findNN(testPoint, trainingData, k):
     a = np.array([1., 1.])
-    distSquares = np.dot((_trainingData[:, 0:2]-_testPoint[0:2]) * (_trainingData[:, 0:2]-_testPoint[0:2]), a)
+    distSquares = np.dot((trainingData[:, 0:2]-testPoint[0:2]) * (trainingData[:, 0:2]-testPoint[0:2]), a)
     
     predictLabels = np.zeros(k)
     for i in range(k):
         j = np.argmin(distSquares)
-        predictLabels[i] = _trainingData[j][2]
+        predictLabels[i] = trainingData[j][2]
         distSquares[j] = float('inf')
     c1 = sum(predictLabels == -1.)
     c2 = sum(predictLabels == 1.)
