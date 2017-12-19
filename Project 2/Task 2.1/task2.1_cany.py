@@ -65,8 +65,7 @@ for d in [10,5,1]:
     # set properties of the legend of the plot
     leg = axs.legend(loc='lower right', shadow=True, fancybox=True, numpoints=1)
     leg.get_frame().set_alpha(0.5)
-            
-
+    
     plt.savefig('prediction_d=%d.pdf'%(d), facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
                 bbox_inches='tight', pad_inches=0.1)
