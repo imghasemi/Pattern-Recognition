@@ -323,7 +323,7 @@ if __name__ == "__main__":
     print_kdtree(root, train_data, True, range(1,8), returnPlt=False, save=True)
     
     # test
-    #test_data = read_file(test_f)
-    #kd_tree_search(root, test_data, save=True)
+    test_data = read_file(test_f)
+    kd_tree_search(root, test_data, save=False)
     
     
