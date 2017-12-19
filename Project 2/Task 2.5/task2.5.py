@@ -1,4 +1,7 @@
 # k-NN using brute force search
+"""
+@author: Chu-I Chao
+"""
 import numpy as np
 import time
 
