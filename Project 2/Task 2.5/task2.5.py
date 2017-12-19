@@ -7,9 +7,9 @@ import time
 
 # kNN function gets the predicted label from findNN function and computes the accuracy of prediction.
 # Parameters:
-#   _testData: test data
-#   _trainingData: training data
-#   _k: use k nearest neighors to vote for the label
+#   testData: test data
+#   trainingData: training data
+#   k: use k nearest neighors to vote for the label
 # Return:
 #   the accuracy of our label prediction
 def kNN(testData, trainingData, k):
@@ -24,9 +24,9 @@ def kNN(testData, trainingData, k):
 # findNN function computes distance^2 between every training data and the given single test data.
 # Then we use linear search to find out k nearest neighbors and vote for the label.
 # Parameters: 
-#   _testPoint: the given single test data
-#   _trainingData: training data
-#   _k: use k nearest neighors to vote for the label
+#   testPoint: the given single test data
+#   trainingData: training data
+#   k: use k nearest neighors to vote for the label
 # Return:
 #   the predicted label of the given single test data
 def findNN(testPoint, trainingData, k):
