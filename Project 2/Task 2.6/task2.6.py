@@ -38,7 +38,6 @@ class Node:
         self.label = label
         self.l_child = l_child
         self.r_child = r_child
-        self.is_leaf = (l_child == r_child)
         self.r_1 = r_1
         self.r_2 = r_2       
 
@@ -68,18 +67,23 @@ def kd_tree(data, depth, frame_coord):
         split_x = d_sorted[split_ind, 0]
         split_y = d_sorted[split_ind, 1]
         split_label = d_sorted[split_ind, 2]
+        split_ind_h = split_ind + 1
     # TODO : midpoint split method
     elif split_method == 'midpoint':
-        mid_p = (d_sorted[:,d][0] + d_sorted[:,d][-1]) / 2
         split_label = -1 # no split labels when midpoint split is used
-        split_ind=np.min(np.where(d_sorted[:,d] >= mid_p))
 
         if d == 0:
-            split_x = mid_p
-            split_y = -1  # irrelevant when we split on the x coordinate system.
+            mid_p = split_x = (frame_coord[0] + frame_coord[1]) / 2
+            split_y = 0  # irrelevant when we split on the x coordinate system.
         else:
-            split_y = mid_p
-            split_x = -1
+            mid_p=split_y = (frame_coord[2] + frame_coord[3]) / 2
+            split_x = 0
+                    
+        s_i = np.where(d_sorted[:,d] < mid_p)[0]
+        if s_i.size > 0:          
+            split_ind_h = split_ind = np.max(s_i) + 1
+        else:
+            split_ind_h = split_ind = 0
            
     # divides horizontally/vertically 
     r_1, r_2, fc_1, fc_2 = None, None, None, None
@@ -103,9 +107,14 @@ def kd_tree(data, depth, frame_coord):
         fc_1 = [frame_coord[0], frame_coord[1], frame_coord[2], split_y]
         fc_2 = [frame_coord[0], frame_coord[1], split_y, frame_coord[3] ] 
 
+     # check max depth when split_method='midpoint'
+    if depth > 8 and split_method == 'midpoint':
+        Node(split_x, split_y, d, split_label, d_sorted[:split_ind,:],
+                d_sorted[split_ind_h:,:], r_1, r_2)
+
     return Node(split_x, split_y, d, split_label, 
                 kd_tree(d_sorted[:split_ind,:], depth+1, fc_1),
-                kd_tree(d_sorted[split_ind+1:,:], depth+1, fc_2),
+                kd_tree(d_sorted[split_ind_h:,:], depth+1, fc_2),
                         r_1, r_2)
 
 # reads first and second column data and labels from the given structured file
@@ -225,7 +234,7 @@ def traverse_tree(root, data, stack):
         if root.y > data[1]:
             traverse_tree(root.l_child, data, stack)   
         elif root.y <= data[1]:
-            traverse_tree(root.r_child, data, stack)         
+            traverse_tree(root.r_child, data, stack)
     
 # search/inference using the generated kd_tree
 # test_data: data to be searched in the tree
@@ -238,13 +247,14 @@ def kd_tree_search(root, test_data, save=False):
         start = time.time()
         s = test_data[i]
         traverse_tree(root, s, node_stack)
+        
         b_node = node_stack.pop()
         b_dist = (b_node.x-s[0])**2 + (b_node.y-s[1])**2
         
         while len(node_stack) > 0:
             c_node = node_stack.pop()
             # distance to the parent node/head node on the stack
-            c_dist = (b_node.x-s[0])**2 + (b_node.y-s[1])**2
+            c_dist = (c_node.x-s[0])**2 + (c_node.y-s[1])**2
             
             # if distance to the parent node/head node on the stack is less
             # than distance to the current best point, then do update
@@ -286,7 +296,7 @@ def kd_tree_search(root, test_data, save=False):
             axs.plot([s[0]], [s[1]], marker='+', markersize=5, color="red" 
                  if b_node.label==1 else "blue")
             
-            filename = 'chart/NN_point_%d.pdf'%(i)
+            filename = 'chart/NN_point_%s_%s_%d.pdf'%(split_method, sel_method, i)
             plt.savefig(filename, facecolor='w', edgecolor='w',
                         papertype=None, format='pdf', transparent=False,
                         bbox_inches='tight', pad_inches=0.1)
@@ -310,10 +320,10 @@ if __name__ == "__main__":
     # tree generation
     train_data = read_file(train_f)
     root = generate_kdtree(train_data)
-    print_kdtree(root, train_data, range(1,5), returnPlt=False, save=True)
+    print_kdtree(root, train_data, True, range(1,8), returnPlt=False, save=True)
     
     # test
-    test_data = read_file(test_f)
-    kd_tree_search(root, test_data, save=False)
+    #test_data = read_file(test_f)
+    #kd_tree_search(root, test_data, save=True)
     
     
