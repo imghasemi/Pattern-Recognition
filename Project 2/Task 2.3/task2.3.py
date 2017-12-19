@@ -33,44 +33,7 @@ For guassian distribution, we directly know that the max probability point is it
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import inv
-from numpy.linalg import matrix_rank
 from numpy.linalg import pinv
-
-
-def plotline(Data, W):
-   
-    #get regression line
-    line_x = np.linspace(120, 200, num=300)
-    X1 = line_x.reshape((line_x.shape[0],1))
-    X0 = np.ones(X1.shape)
-    X2 = X1 * X1
-    X3 = X1 * X2
-    X4 = X1 * X3
-    X5 = X1 * X4
-    X = np.concatenate((X5,X4,X3,X2,X1,X0),axis = 1)
-    #X = np.concatenate((X0,X1,X2,X3,X4,X5),axis = 1)
-    line_y = (X.dot(W))
-    
-    #create a fig
-    fig = plt.figure()
-    axs = fig.add_subplot(111)
-    axs.set_xlim(120, 200)
-    axs.set_ylim(-2 , 200)
-    axs.plot(Data[:,1], Data[:,0],'bo',label = ' data')
-    axs.plot(line_x,line_y,'r',label = 'fitting line')
-    
-    # set properties of the legend of the plot
-    leg = axs.legend(loc='upper right', shadow=True, fancybox=True, numpoints=1)
-    leg.get_frame().set_alpha(0.5)
-    
-    
-    # set x,y axis labels
-    axs.set_xlabel("X")
-    axs.set_ylabel("Y")
-    #plt.show()
-    plt.savefig("plot_task_2.3.pdf", facecolor='w', edgecolor='w',
-        papertype=None, format='pdf', transparent=False,
-                bbox_inches='tight', pad_inches=0.1)
 
 
 if __name__ == "__main__":
@@ -78,46 +41,91 @@ if __name__ == "__main__":
     data = np.loadtxt('whData.dat',dtype=np.object,comments='#',delimiter=None)
 
     # read height and weight data into 2D array (i.e. into a matrix)
-    X = data[:,0:2].astype(np.float)
+    X_ori = data[:,0:2].astype(np.float)
     
-    #remove outliar, not in this task.
-    #outlierInd = np.where( X[:,0] != -1 ) 
-    #X = X[outlierInd]
-    
-    
-    #read height data to Y
-    Y = X[:,0:1].copy()
+    # remove data we want estimate
+    mask = (X_ori[:,0] == -1)
+    X_est, X = X_ori[mask][:,1], X_ori[~mask][:,1]
+    Y = X_ori[~mask][:,0]
     
     #generate design matrix
-    X[:,0:1] = np.ones(X[:,0:1].shape)
-    X0 = X[:,0:1]
-    X1 = X[:,1:2]
-    X2 = X[:,1:2] * X[:,1:2]
-    X3 = X[:,1:2] * X2
-    X4 = X[:,1:2] * X3
-    X5 = X[:,1:2] * X4
-    X = np.concatenate((X5,X4,X3,X2,X1,X0),axis = 1)
-
+    X0 = np.ones(X.shape)
+    X1 = X
+    X2 = X * X
+    X3 = X * X2
+    X4 = X * X3
+    X5 = X * X4
+    X = np.vstack((X5,X4,X3,X2,X1,X0)).transpose()
     
     #generate sigma0 and sigma
     sigma0Square = 3.0
-    sigmaSquare = 1000.0   # this number should test
+    sigmaSquare = 100.0   # this number can altnatively change
     
-    #test with LSE
-    W_hat_lse, res, rank, s = np.linalg.lstsq(X, Y)
-    # the rank of X = 5, then XTX rank is also 5, which means it is not full rank....
-    #the inves has some problems.
-    #but the least square function from numpy is very good.  how it realize?
+    #estimate W with Least Square Method
+    #note: regradless of XTX is invertible or not, we can always use its pesudo inverse
+    #to calculate this least square method
+    #then it becomes
+    # W = pinv(X)*Y
+    W_hat_lse = pinv(X).dot(Y)
     
-    #estimate W
+    #estimate W with Baysian regression
     XTX = X.transpose().dot(X)
-    #rank_xtx = matrix_rank(XTX)
-    #W_hat = inv(XTX)
-    #W_hat = pinv((XTX+(sigmaSquare/sigma0Square)*np.identity(XTX.shape[0])))
-    W_hat = inv((XTX+(sigmaSquare/sigma0Square)*np.identity(XTX.shape[0])))
+    temp_value = XTX+(sigmaSquare/sigma0Square)*np.identity(XTX.shape[0])    
+    W_hat = inv(temp_value)
     W_hat = W_hat.dot(X.transpose())
     W_hat = W_hat.dot(Y)
     
     #plot
-    plotline(data[:,0:2].astype(np.float), W_hat)
+    #set up and low bound
+    min_x, max_x = min(X[:,4]), max(X[:,4])
+    min_y, max_y = min(Y), max(Y)
+    ax_x_min, ax_x_max = min_x-(max_x-min_x)/3, max_x+(max_x-min_x)/3
+    ax_y_min, ax_y_max = min_y-(max_y-min_y)/3, max_y+(max_y-min_y)/3
     
+    #create a fig
+    fig = plt.figure()
+    axs = fig.add_subplot(111)   
+    axs.set_xlim(ax_x_min, ax_x_max)
+    axs.set_ylim(ax_y_min, ax_y_max)
+    
+    plt.xlabel('Height\nSigmasquare = '+str(sigmaSquare))
+    plt.ylabel('Weight')
+    
+    #get regression lines and points
+    line_x = np.linspace(ax_x_min, ax_x_max, 1000)
+    axs.plot(line_x, np.polyval(W_hat, line_x), label='Baysian',color='green')
+    axs.plot(line_x, np.polyval(W_hat_lse, line_x), label='LSE',color='blue')
+    axs.scatter(X[:,4], Y, s=10, color='orange')
+    axs.scatter(X_est, np.polyval(W_hat, X_est), label="est from Byasian", s=20, color='red')
+    axs.scatter(X_est, np.polyval(W_hat_lse, X_est), label = "est from LSE", s=20, color='pink')
+    
+    # set properties of the legend of the plot
+    leg = axs.legend(loc='lower right', shadow=True, fancybox=True, numpoints=1)
+    leg.get_frame().set_alpha(0.5)
+    
+    plt.savefig('prediction_sigma=%d.pdf'%(sigmaSquare), facecolor='w', edgecolor='w',
+                papertype=None, format='pdf', transparent=False,
+                bbox_inches='tight', pad_inches=0.1)
+    plt.close()
+   
+    # the result of estimate:
+    # when sigampower = 100
+    # Weight(168) = 60.94 kg
+    # Weight(167) = 59.27 kg
+    # Weight(172) = 68.42 kg
+ 
+    # when sigampower = 10
+    # Weight(168) = 60.44 kg
+    # Weight(167) = 58.77 kg
+    # Weight(172) = 68.21 kg
+    
+    # when sigampower = 1
+    # Weight(168) = 60.37 kg
+    # Weight(167) = 58.70 kg
+    # Weight(172) = 68.17 kg
+    
+    # Lse estimate
+    # Weight(168) = 58.62 kg
+    # Weight(167) = 55.98 kg
+    # Weight(172) = 69.53 kg
+
