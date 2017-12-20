@@ -33,9 +33,9 @@ For guassian distribution, we directly know that the max probability point is it
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import inv
-from numpy.linalg import pinv
-from numpy.linalg import cond
-from scipy.sparse.linalg import lsqr
+#from numpy.linalg import pinv
+#from numpy.linalg import cond
+#from scipy.sparse.linalg import lsqr
 
 if __name__ == "__main__":
      # read data as 2D array of data type 'object'
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     
     #generate sigma0 and sigma
     sigma0Square = 3.0
-    sigmaSquare = 10.0   # this number can altnatively change
+    sigmaSquare = 1000.0   # this number can altnatively change
     
     #estimate W with Least Square Method
     #note: regradless of XTX is invertible or not, we can always use its pesudo inverse
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     
     #get regression lines and points
     line_x = np.linspace(ax_x_min, ax_x_max, 1000)
-    axs.plot(line_x, np.polyval(W_hat, line_x), label='Baysian',color='green')
+    axs.plot(line_x, np.polyval(W_hat, line_x), label='Bayesian',color='green')
     axs.plot(line_x, np.polyval(W_hat_lse, line_x), label='LSE',color='blue')
     axs.scatter(X[:,4], Y, s=10, color='orange')
     axs.scatter(X_est, np.polyval(W_hat, X_est), label="est from Bayesian", s=20, color='red')
