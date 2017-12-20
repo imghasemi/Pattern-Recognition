@@ -20,7 +20,7 @@ split_method='median'
 #   sel_method: determines how to select the splitting dimension
 #       'alternate': alternate between the x and  the y dimension 
 #       'variance': split the data along the dimension of higher variance.
-sel_method='variance'
+sel_method='alternate'
 
 class Node:
     # Node of a kd-tree
@@ -329,6 +329,6 @@ if __name__ == "__main__":
     
     # test
     test_data = read_file(test_f)
-    kd_tree_search(root, test_data, save=True)
+    kd_tree_search(root, test_data, save=False)
     
     
