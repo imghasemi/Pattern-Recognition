@@ -38,7 +38,7 @@ for d in [1, 5, 10]:
     # Here we calculate Least Square Regression
     wLsq = np.linalg.lstsq(X, y)[0]
 
-    print("Error for d=%d GE =>" % (d), np.linalg.norm(np.dot(X, w) - y))
+    # print("Error for d=%d GE =>" % (d), np.linalg.norm(np.dot(X, w) - y))
     print("Error for d=%d LSQ =>" % (d), np.linalg.norm(np.dot(X, wLsq) - y))
 
     # draw plot
