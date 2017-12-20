@@ -34,7 +34,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import inv
 from numpy.linalg import pinv
-
+from numpy.linalg import cond
+from scipy.sparse.linalg import lsqr
 
 if __name__ == "__main__":
      # read data as 2D array of data type 'object'
@@ -43,12 +44,15 @@ if __name__ == "__main__":
     # read height and weight data into 2D array (i.e. into a matrix)
     X_ori = data[:,0:2].astype(np.float)
     
-    # remove data we want estimate
+#    # remove data we want estimate, but should we remove these outliar???
     mask = (X_ori[:,0] == -1)
-    X_est, X = X_ori[mask][:,1], X_ori[~mask][:,1]
-    Y = X_ori[~mask][:,0]
+#    X_est, X = X_ori[mask][:,1], X_ori[~mask][:,1]
+#    Y = X_ori[~mask][:,0]
+    X_est = X_ori[mask][:,1]
+    Y = X_ori[:,0]
     
     #generate design matrix
+    X = X_ori[:,1]
     X0 = np.ones(X.shape)
     X1 = X
     X2 = X * X
@@ -56,24 +60,28 @@ if __name__ == "__main__":
     X4 = X * X3
     X5 = X * X4
     X = np.vstack((X5,X4,X3,X2,X1,X0)).transpose()
+
     
     #generate sigma0 and sigma
     sigma0Square = 3.0
-    sigmaSquare = 100.0   # this number can altnatively change
+    sigmaSquare = 10.0   # this number can altnatively change
     
     #estimate W with Least Square Method
     #note: regradless of XTX is invertible or not, we can always use its pesudo inverse
     #to calculate this least square method
     #then it becomes
     # W = pinv(X)*Y
-    W_hat_lse = pinv(X).dot(Y)
+    #W_hat_lse = pinv(X).dot(Y)
+    #W_hat_lse = np.linalg.solve(np.dot(X.T, X), np.dot(X.T, Y))
+    #however, this lstsq method is best, it is robust and fast
+    W_hat_lse = np.linalg.lstsq(X,Y)[0]
     
     #estimate W with Baysian regression
-    XTX = X.transpose().dot(X)
-    temp_value = XTX+(sigmaSquare/sigma0Square)*np.identity(XTX.shape[0])    
-    W_hat = inv(temp_value)
-    W_hat = W_hat.dot(X.transpose())
-    W_hat = W_hat.dot(Y)
+    #for this formula, we don't have numrical instability problems, so just using the inv method
+    n,m = X.shape
+    I = np.identity(m)
+    W_hat = np.dot(np.dot(inv(np.dot(X.T,X) + (sigmaSquare/sigma0Square)*I),X.T),Y)
+
     
     #plot
     #set up and low bound
@@ -88,7 +96,7 @@ if __name__ == "__main__":
     axs.set_xlim(ax_x_min, ax_x_max)
     axs.set_ylim(ax_y_min, ax_y_max)
     
-    plt.xlabel('Height\nSigmasquare = '+str(sigmaSquare))
+    plt.xlabel('Height\nSigma^2 = '+str(sigmaSquare))
     plt.ylabel('Weight')
     
     #get regression lines and points
@@ -96,7 +104,7 @@ if __name__ == "__main__":
     axs.plot(line_x, np.polyval(W_hat, line_x), label='Baysian',color='green')
     axs.plot(line_x, np.polyval(W_hat_lse, line_x), label='LSE',color='blue')
     axs.scatter(X[:,4], Y, s=10, color='orange')
-    axs.scatter(X_est, np.polyval(W_hat, X_est), label="est from Byasian", s=20, color='red')
+    axs.scatter(X_est, np.polyval(W_hat, X_est), label="est from Bayesian", s=20, color='red')
     axs.scatter(X_est, np.polyval(W_hat_lse, X_est), label = "est from LSE", s=20, color='pink')
     
     # set properties of the legend of the plot
@@ -108,24 +116,5 @@ if __name__ == "__main__":
                 bbox_inches='tight', pad_inches=0.1)
     plt.close()
    
-    # the result of estimate:
-    # when sigampower = 100
-    # Weight(168) = 60.94 kg
-    # Weight(167) = 59.27 kg
-    # Weight(172) = 68.42 kg
- 
-    # when sigampower = 10
-    # Weight(168) = 60.44 kg
-    # Weight(167) = 58.77 kg
-    # Weight(172) = 68.21 kg
-    
-    # when sigampower = 1
-    # Weight(168) = 60.37 kg
-    # Weight(167) = 58.70 kg
-    # Weight(172) = 68.17 kg
-    
-    # Lse estimate
-    # Weight(168) = 58.62 kg
-    # Weight(167) = 55.98 kg
-    # Weight(172) = 69.53 kg
 
+    
