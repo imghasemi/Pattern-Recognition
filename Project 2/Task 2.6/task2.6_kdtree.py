@@ -20,7 +20,7 @@ split_method='median'
 #   sel_method: determines how to select the splitting dimension
 #       'alternate': alternate between the x and  the y dimension 
 #       'variance': split the data along the dimension of higher variance.
-sel_method='alternate'
+sel_method='variance'
 
 class Node:
     # Node of a kd-tree
@@ -194,7 +194,11 @@ def print_kdtree(root, data, scatter=True, level=range(1,5), returnPlt=False,
         axs.set_aspect('equal')
         # scatter data points on plot
         if scatter:
-            axs.scatter(data[:,0], data[:,1], s=20, c=data[:,-1], cmap="bwr")
+            mask_1 = data[:,-1]==1
+            mask_2 = data[:,-1]==-1
+            axs.scatter(data[mask_1,0], data[mask_1,1], s=20, color='red')
+            axs.scatter(data[mask_2,0], data[mask_2,1], s=20, color='green')
+            plt.legend(('y=+1', 'y=-1'))
             
         # set x and y limits of the plotting area
         axs.set_xlim(min_x, max_x)
@@ -290,14 +294,15 @@ def kd_tree_search(root, test_data, save=False):
             axs = print_kdtree(root, test_data, False, range(5,6), True, False)
             x = b_node.x
             y = b_node.y
-            # draw train/test points
-            axs.plot([x], [y], marker='o', markersize=3, color="red"
-                 if b_node.label==1 else "blue" )
-            axs.plot([s[0]], [s[1]], marker='+', markersize=5, color="red" 
+
+            ll = axs.scatter(x, y, s=20, marker='x', color="red"
                  if b_node.label==1 else "blue")
+            lo = axs.scatter(s[0], s[1], s=20, marker='o', color="red"
+                 if b_node.label==1 else "blue")
+            plt.legend((ll,lo), ('Train', 'Test'), scatterpoints=1)
             
             filename = 'chart/NN_point_%s_%s_%d.pdf'%(split_method, sel_method, i)
-            plt.savefig(filename, facecolor='w', edgecolor='w',
+            plt.savefig(filename, facecolor='w', edgeclor='w',
                         papertype=None, format='pdf', transparent=False,
                         bbox_inches='tight', pad_inches=0.1)
             plt.close()
@@ -306,7 +311,7 @@ def kd_tree_search(root, test_data, save=False):
         fig = plt.figure()
         axs = fig.add_subplot(111)
         x = np.linspace(0, len(bench_m), len(test_data))
-        axs.plot(x, bench_m*1000, label='benchmark(msec)')
+        axs.plot(x, bench_m*1000, label='%s_%s.pdf(msec)'%(split_method, sel_method))
         plt.xlabel('samples')
         plt.ylabel('msec')
         axs.legend(loc='upper left', shadow=True, fancybox=True, numpoints=1)
@@ -324,6 +329,6 @@ if __name__ == "__main__":
     
     # test
     test_data = read_file(test_f)
-    kd_tree_search(root, test_data, save=False)
+    kd_tree_search(root, test_data, save=True)
     
     

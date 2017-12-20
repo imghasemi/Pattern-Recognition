@@ -35,12 +35,6 @@ for d in [1, 5, 10]:
     # w = np.dot(np.dot(np.linalg.inv(np.dot(X.T,X)),X.T), y)
     w = np.linalg.solve(np.dot(X.T, X), np.dot(X.T, y))
 
-    # Here we calculate Least Square Regression
-    #wLsq = np.linalg.lstsq(X, y)[0]
-
-    # print("Error for d=%d GE =>" % (d), np.linalg.norm(np.dot(X, w) - y))
-    #print("Error for d=%d LSQ =>" % (d), np.linalg.norm(np.dot(X, wLsq) - y))
-
     # draw plot
     x = np.linspace(ax_x_min, ax_x_max, 10000)
     axs.set_xlim(ax_x_min, ax_x_max)
