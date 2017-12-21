@@ -298,7 +298,7 @@ def kd_tree_search(root, test_data, save=False):
             ll = axs.scatter(x, y, s=20, marker='x', color="red"
                  if b_node.label==1 else "blue")
             lo = axs.scatter(s[0], s[1], s=20, marker='o', color="red"
-                 if b_node.label==1 else "blue")
+                 if s[2]==1 else "blue")
             plt.legend((ll,lo), ('Train', 'Test'), scatterpoints=1)
             
             filename = 'chart/NN_point_%s_%s_%d.pdf'%(split_method, sel_method, i)
