@@ -15,12 +15,12 @@ test_f  = "data2-test.dat"
 # split_method: determines how to compute the split point
 #   'midpoint': split at the midpoint of the data
 #   'median': split at the median of the data
-split_method='median'
+split_method='midpoint'
 
 #   sel_method: determines how to select the splitting dimension
 #       'alternate': alternate between the x and  the y dimension 
 #       'variance': split the data along the dimension of higher variance.
-sel_method='alternate'
+sel_method='variance'
 
 class Node:
     # Node of a kd-tree
@@ -71,12 +71,11 @@ def kd_tree(data, depth, frame_coord):
     # TODO : midpoint split method
     elif split_method == 'midpoint':
         split_label = -1 # no split labels when midpoint split is used
-
         if d == 0:
-            mid_p = split_x = (frame_coord[0] + frame_coord[1]) / 2
+            mid_p = split_x = (d_sorted[0, d] + d_sorted[-1, d]) / 2
             split_y = 0  # irrelevant when we split on the x coordinate system.
         else:
-            mid_p=split_y = (frame_coord[2] + frame_coord[3]) / 2
+            mid_p = split_y = (d_sorted[0, d] + d_sorted[-1, d]) / 2
             split_x = 0
                     
         s_i = np.where(d_sorted[:,d] < mid_p)[0]
