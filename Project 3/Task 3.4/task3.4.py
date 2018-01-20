@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from math import e
+import matplotlib.cm as mpl_cm 
     
 def f(x1, x2, w1, w2, theta):
     return 2*e**(-0.5 * ((w1*x1 + w2*x2 - theta)**2))-1
@@ -32,8 +33,10 @@ def gradientDescend(x1_list, x2_list, y_list, w1, w2, theta):
     
     return w1_new, w2_new, theta_new
     
-def m_plot(x1_list, x2_list, y_list):
-    # plotting: moving spines to the center, passing through (0,0)
+def m_plotClassifierAndData(n_loop, x1_list, x2_list, y_list):
+    plt.figure()
+    # step 1. plot the Data 
+    # step 1.1: move spines to the center, passing through (0,0)
     ax = plt.gca()  
     
     ax.spines['right'].set_color('none')
@@ -45,11 +48,24 @@ def m_plot(x1_list, x2_list, y_list):
     ax.spines['bottom'].set_position('center')
     ax.spines['left'].set_position('center')
     
-    # plotting
-    plt.plot(x1_list[y_list==1], x2_list[y_list==1], 'ro', label="1")
-    plt.plot(x1_list[y_list==-1], x2_list[y_list==-1], 'co', label="-1")
+    # step 1.2: plot data
+    plt.plot(x1_list[y_list==1], x2_list[y_list==1], 'bo', label="1")
+    plt.plot(x1_list[y_list==-1], x2_list[y_list==-1], 'ro', label="-1")
     plt.legend(loc="best", numpoints=1)
     
+    # step 2. plot the classifier  
+    vmin = -2
+    vmax =  2
+    cpal = "RdBu"
+    cmap_cont = mpl_cm.get_cmap(cpal)
+    x = np.arange(-2.0, 2.0, 0.01)
+    y = np.arange(-2.0, 2.0, 0.01)
+    xx, yy = np.meshgrid(x, y)
+    z = f(xx, yy, w1, w2, theta)
+    ax.pcolormesh(x, y, z,
+               cmap=cmap_cont,
+               vmin=vmin,vmax=vmax )
+    plt.title('classifier obtained after ' + str(n_loop) + ' loops')
     plt.show()
     
 if __name__ == "__main__":
@@ -59,21 +75,18 @@ if __name__ == "__main__":
     x1_list = data[0] 
     x2_list = data[1]
     y_list = labels
-    
-    m_plot(x1_list, x2_list, y_list)
-    
-    w1 = w2 = theta = 1
+  
+    w1 = 1
+    w2 = -0.5 
+    theta = 0
+    m_plotClassifierAndData(0, x1_list, x2_list, y_list)
+
     n_loop = 50
     
     for i in xrange(n_loop):
         [w1, w2, theta] = gradientDescend(x1_list, x2_list, y_list, w1, w2, theta)
     
-    y_new = []
-    for i in xrange(200):
-        y_new.append(f(x1_list[i], x2_list[i], w1, w2, theta))
+    y_new = f(x1_list, x2_list, w1, w2, theta)
 
-    plt.figure()
-    plt.axis([0, 200, -1.1, 1.1])
-    plt.plot(y_new, 'r')
-    plt.plot(y_list, 'b')
-    plt.show()
+    m_plotClassifierAndData(n_loop, x1_list, x2_list, y_list)
+    
