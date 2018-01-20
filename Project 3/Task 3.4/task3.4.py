@@ -23,8 +23,11 @@ def make_mashgrid(train_d, step=0.01):
     x1_max = train_d[:, 0].max()
     x2_min = train_d[:, 1].min()
     x2_max = train_d[:, 1].max()
-    return np.meshgrid(np.arange(x1_min, x1_max, step),
-                       np.arange(x2_min, x2_max, step))
+    x1_span = (x1_max-x1_min)*0.3
+    x2_span = (x2_max-x2_min)*0.3
+
+    return np.meshgrid(np.arange(x1_min-x1_span, x1_max+x1_span, step),
+                       np.arange(x2_min-x2_span, x2_max+x2_span, step))
 
 
 # def plot_data(X, y, X_ev, y_ev, x1x1_, x2x2_, filename='file1.png'):
@@ -99,8 +102,8 @@ def predict_and_plot(X, y, clf_tuple):
     X_neg = XY[XY[:, 2] < 0][:, 0:2]
 
     # plot data
-    plt.plot(X_pos[:, 0], X_pos[:, 1], 'bo', label='+1 (train data)', alpha=0.6)
-    plt.plot(X_neg[:, 0], X_neg[:, 1], 'yo', label='-1 (train data)', alpha=0.6)
+    plt.plot(X_pos[:, 0], X_pos[:, 1], 'bo', label='+1 (train data)', alpha=0.5)
+    plt.plot(X_neg[:, 0], X_neg[:, 1], 'yo', label='-1 (train data)', alpha=0.5)
 
     global plot_dir
     output_file = '.'.join([description.replace(' ', '_').
