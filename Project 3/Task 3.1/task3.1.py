@@ -18,10 +18,15 @@ n_clusters = 3
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
+debug = False
+
 def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
     # create a figure and its axes
     fig = plt.figure()
     axs = fig.add_subplot(111)
+    
+    if debug:
+        filename = None
     
     # k < 9
     colors = "bgrcmykw"
