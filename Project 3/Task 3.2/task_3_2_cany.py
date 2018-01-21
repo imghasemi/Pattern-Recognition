@@ -41,7 +41,7 @@ def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
     for i in range(n_clusters):
         axs.scatter(x[labels==i], y[labels==i], alpha=0.5, c=colors[i],  
                      edgecolors='none', s=20)
-        if centers != [] :
+        if len(centers):
             axs.scatter(centers[i,0], centers[i,1], c=colors[i],  
                 edgecolors='yellow', s=75, marker='s')       
     
