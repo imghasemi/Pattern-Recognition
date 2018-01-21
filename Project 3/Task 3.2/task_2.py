@@ -58,7 +58,7 @@ def task_2():
 
     D = np.zeros((len(df[0]),len(df[1])))
 
-    sums = S.sum(axis=1)
+    sums = S.sum(axis=0)
     np.fill_diagonal(D, sums)
 
     L = D - S
