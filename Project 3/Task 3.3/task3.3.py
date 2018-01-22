@@ -58,14 +58,28 @@ if __name__ == "__main__":
     # 2D LDA
     for m, n in zip([1., 2., 3.], ['red', 'blue', 'green']):
         plt.scatter(finalLDA.T[0][np.where(Y_Label == m)], finalLDA.T[1][np.where(Y_Label == m)], color=n)
-    plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=4)
+        plt.title('LDA Algorithm 2D')
+    plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=3)
+    plt.savefig('Figure_LDA_2D.pdf', facecolor='w', edgecolor='w',
+                papertype=None, format='pdf', transparent=False,
+                bbox_inches='tight', pad_inches=0.1)
     plt.show()
 
-    # 2D - For Comparison
-    plt.scatter(finalLDA.T[0], finalLDA.T[1], color='red')
-    plt.scatter(finalPCA.T[0], finalPCA.T[1])
-    plt.legend(('LDA', 'PCA'), loc=3)
+    # 2D PCA
+    for m, n in zip([1., 2., 3.], ['red', 'blue', 'green']):
+        plt.scatter(finalPCA.T[0][np.where(Y_Label == m)], finalPCA.T[1][np.where(Y_Label == m)], color=n)
+        plt.title('PCA Algorithm 2D')
+    plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=3)
+    plt.savefig('Figure_PCA_2D.pdf', facecolor='w', edgecolor='w',
+                papertype=None, format='pdf', transparent=False,
+                bbox_inches='tight', pad_inches=0.1)
     plt.show()
+
+    # # 2D - For Comparison
+    # plt.scatter(finalLDA.T[0], finalLDA.T[1], color='red')
+    # plt.scatter(finalPCA.T[0], finalPCA.T[1])
+    # plt.legend(('LDA', 'PCA'), loc=3)
+    # plt.show()
 
     # -------------------------------------------------------------------------------------------------------------
     # 3D
@@ -77,4 +91,8 @@ if __name__ == "__main__":
         axs.scatter3D((finalLDA_3D.T)[0][np.where(Y_Label == m)], (finalLDA_3D.T)[1][np.where(Y_Label == m)],
                       (finalLDA_3D.T)[2][np.where(Y_Label == m)], color=n)
     plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=4)
+    plt.title('LDA Algorithm 3D')
+    plt.savefig('Figure_LDA_3D.pdf', facecolor='w', edgecolor='w',
+                papertype=None, format='pdf', transparent=False,
+                bbox_inches='tight', pad_inches=0.1)
     plt.show()
