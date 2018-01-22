@@ -10,6 +10,7 @@ plot_dir = 'plots'
 
 def make_mashgrid(train_d, step=0.01):
     """
+    Creates a mashgrid of points
     :param train_d: train data of x1 and x2
     :param step: the step for grid
     :return: the gird of points
@@ -27,6 +28,7 @@ def make_mashgrid(train_d, step=0.01):
 
 def predict_and_plot(X, y, clf_tuple):
     """
+    generates SVM and plots the prediction with train data
     Fits the svm to train data, makes a prediction for the
     test data. Plots the results in img folder.
 
@@ -41,9 +43,7 @@ def predict_and_plot(X, y, clf_tuple):
     fig.suptitle(description)
 
     x1x1, x2x2 = make_mashgrid(X)
-    clf.fit(X, y)
-    # classify test data
-    y_ev = clf.predict(X)
+    clf.fit(X, y.ravel())
     # cover the plot by colored grid
     Z = clf.predict(np.c_[x1x1.ravel(), x2x2.ravel()])
     print 'this is support vector = ', clf.support_vectors_, ' for ', description
@@ -70,16 +70,23 @@ def predict_and_plot(X, y, clf_tuple):
 
 
 def svm_prediction(X, y):
+    """
+    defines different types of SVMs and runs a prediction for each one
+    :param X: matrix of x1 and x2
+    :param y: array of labels
+    :return:
+    """
     clfs = {'linear: c=1.0': svm.SVC(kernel='linear', C=1.0),
-            # 'rbf: gamma=0.7, C=5.0': svm.SVC(kernel='rbf', gamma=0.7, C=0.5),
-            # 'rbf: gamma=0.7, C=1.0': svm.SVC(kernel='rbf', gamma=0.7, C=1.0),
-            # 'rbf: gamma=0.7, C=2.0': svm.SVC(kernel='rbf', gamma=0.7, C=2.0),
-            # 'rbf: gamma=0.7, C=8.0': svm.SVC(kernel='rbf', gamma=0.7, C=4.0),
-            # 'rbf: gamma=0.5, C=5.0': svm.SVC(kernel='rbf', gamma=0.5, C=0.5),
-            # 'rbf: gamma=0.5, C=1.0': svm.SVC(kernel='rbf', gamma=0.5, C=1.0),
-            # 'rbf: gamma=0.5, C=2.0': svm.SVC(kernel='rbf', gamma=0.5, C=2.0),
-            # 'rbf: gamma=0.5, C=8.0': svm.SVC(kernel='rbf', gamma=0.5, C=4.0),
-            # 'poly: degree=3, C=1.0': svm.SVC(kernel='poly', degree=3, C=1.0),
+            'rbf: gamma=0.7, C=5.0': svm.SVC(kernel='rbf', gamma=0.7, C=0.5),
+            'rbf: gamma=0.7, C=1.0': svm.SVC(kernel='rbf', gamma=0.7, C=1.0),
+            'rbf: gamma=0.7, C=2.0': svm.SVC(kernel='rbf', gamma=0.7, C=2.0),
+            'rbf: gamma=0.7, C=8.0': svm.SVC(kernel='rbf', gamma=0.7, C=4.0),
+            'rbf: gamma=0.5, C=5.0': svm.SVC(kernel='rbf', gamma=0.5, C=0.5),
+            'rbf: gamma=0.5, C=1.0': svm.SVC(kernel='rbf', gamma=0.5, C=1.0),
+            'rbf: gamma=0.5, C=2.0': svm.SVC(kernel='rbf', gamma=0.5, C=2.0),
+            'rbf: gamma=0.5, C=8.0': svm.SVC(kernel='rbf', gamma=0.5, C=4.0),
+            'poly: degree=3, C=1.0': svm.SVC(kernel='poly', degree=3, C=1.0),
+            'poly: degree=3, C=2.0': svm.SVC(kernel='poly', degree=3, C=2.0),
             'poly: degree=4, C=1.0': svm.SVC(kernel='poly', degree=4, C=1.0),
             }
     for k, v in clfs.items():
@@ -89,10 +96,10 @@ def svm_prediction(X, y):
 
 def main():
     # PxN
-    x = np.loadtxt(x_file, delimiter=',', dtype=float).T
+    X = np.loadtxt(x_file, delimiter=',', dtype=float).T
     # PxM
-    y = np.loadtxt(y_file).reshape(x.shape[0], 1)
-    svm_prediction(x, y)
+    y = np.loadtxt(y_file).reshape(X.shape[0], 1)
+    svm_prediction(X, y)
 
 
 if __name__ == '__main__':
