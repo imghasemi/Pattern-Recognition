@@ -9,6 +9,11 @@ plot_dir = 'plots'
 
 
 def make_mashgrid(train_d, step=0.01):
+    """
+    :param train_d: train data of x1 and x2
+    :param step: the step for grid
+    :return: the gird of points
+    """
     x1_min = train_d[:, 0].min()
     x1_max = train_d[:, 0].max()
     x2_min = train_d[:, 1].min()
@@ -39,8 +44,6 @@ def predict_and_plot(X, y, clf_tuple):
     clf.fit(X, y)
     # classify test data
     y_ev = clf.predict(X)
-    # set new labels for the test data after classification
-    XY = np.vstack((X.T, y_ev.T)).T
     # cover the plot by colored grid
     Z = clf.predict(np.c_[x1x1.ravel(), x2x2.ravel()])
     print 'this is support vector = ', clf.support_vectors_, ' for ', description
@@ -48,6 +51,7 @@ def predict_and_plot(X, y, clf_tuple):
     # axs.contourf(x1x1, x2x2, Z, cmap=plt.cm.coolwarm, alpha=0.5)
     axs.contourf(x1x1, x2x2, Z, colors=('y', 'b'), alpha=0.5)
 
+    XY = np.vstack((X.T, y.T)).T
     X_pos = XY[XY[:, 2] > 0][:, 0:2]
     X_neg = XY[XY[:, 2] < 0][:, 0:2]
 
