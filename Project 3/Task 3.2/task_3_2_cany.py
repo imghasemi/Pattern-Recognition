@@ -21,7 +21,7 @@ n_clusters = 2
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
-debug = True
+debug = False
 
 def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
     # create a figure and its axes
@@ -128,7 +128,7 @@ def spectral(data):
     fiedl = v[:,np.argsort(w)[1]] 
     labels = (fiedl < 0).astype(int)
     
-    plotData2D(data, 'spectral', labels, [], 'Spectral Clustering' )
+    plotData2D(data, 'spectral.pdf', labels, [], 'Spectral Clustering' )
     
     
     
