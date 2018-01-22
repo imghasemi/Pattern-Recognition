@@ -1,77 +1,75 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jan 21 11:29:06 2018
+
+@author: qn
+"""
 
 import numpy as np
 import numpy.linalg as la
 import numpy.polynomial.polynomial as poly
 import matplotlib.pyplot as plt
 
-train_file = 'whData.dat'
-plot_dir = 'plots'
 
+def plot_data_and_fit(h, w, x, y):
+    plt.plot(h, w, 'ko', x, y, 'r-')
+    plt.xlim(xmin,xmax)
+    plt.ylim(ymin,ymax)
+    plt.show()
 
-def main():
-    dt = np.dtype([('weight', np.int), ('height', np.int), ('sex', np.str_, 1)])
-    d = np.loadtxt(fname='whData.dat', comments='#', dtype=dt)
-    # heights with missed weight
-    h_ = d[np.where(d['weight'] < 0)]['height']
-    # remove outliers
-    d = d[np.where(d['weight'] >= 0)]
-    wgt = d['weight']
-    hgt = d['height']
+def trsf(x):
+    return x / 100.
 
-    xmin = hgt.min() - 15
-    xmax = hgt.max() + 15
-    ymin = wgt.min() - 15
-    ymax = wgt.max() + 15
+if __name__ == "__main__":
 
-    def plot_data_and_fit(h, w, x, y, descr='plot', output_f='plot.png'):
-        fig = plt.figure()
-        fig.suptitle(descr)
-        plt.plot(h, w, 'ko', x, y, 'r-')
-        plt.xlim(xmin, xmax)
-        plt.ylim(ymin, ymax)
-        output_f = '/'.join([plot_dir, output_f])
-        plt.savefig(output_f, facecolor='w', edgecolor='w',
-                papertype=None, format='png', transparent=False,
-                bbox_inches='tight', pad_inches=0.1)
-        plt.close()
+    data = np.loadtxt('whData.dat',dtype=np.object,comments='#',delimiter=None)
 
-    def trsf(x):
-        return x / 100.
+    # read height and weight data into 2D array (i.e. into a matrix)
+    X = data[:,0:2].astype(np.float)
 
+    # read gender data into 1D array (i.e. into a vector)
+    y = data[:,2]
+
+    # Task 1.1
+    outlierInd = np.where( X[:,0] != -1 )
+    X, y = X[outlierInd], y[outlierInd]
+
+    # let's transpose t data matrix
+    X = X.T
+    hgt = X[1,:]
+    wgt = X[0,:]
+    xmin = hgt.min()-15
+    xmax = hgt.max()+15
+    ymin = wgt.min()-15
+    ymax = wgt.max()+15
     n = 10
     x = np.linspace(xmin, xmax, 100)
+
     # method 1:
     # regression using ployfit
     c = poly.polyfit(hgt, wgt, n)
     y = poly.polyval(x, c)
-    plot_data_and_fit(hgt, wgt, x, y, 'meth1: polyfit', 'polyfit.png')
+    plot_data_and_fit(hgt, wgt, x, y)
 
     # method 2:
     # regression using the Vandermonde matrix and pinv
     X = poly.polyvander(hgt, n)
     c = np.dot(la.pinv(X), wgt)
-    y = np.dot(poly.polyvander(x, n), c)
-    plot_data_and_fit(hgt, wgt, x, y, 'meth2: Vandermonde matrix and pinv',
-                      'vandermonde_pinv.png')
+    y = np.dot(poly.polyvander(x,n), c)
+    plot_data_and_fit(hgt, wgt, x, y)
 
     # method 3:
     # regression using the Vandermonde matrix and lstsq
     X = poly.polyvander(hgt, n)
     c = la.lstsq(X, wgt)[0]
-    y = np.dot(poly.polyvander(x, n), c)
-    plot_data_and_fit(hgt, wgt, x, y, 'meth3: Vandermonde matrix and lstsq',
-                      'vandermonde_lstsq.png')
+    y = np.dot(poly.polyvander(x,n), c)
+    plot_data_and_fit(hgt, wgt, x, y)
+
     # method 4:
     # regression on transformed data using the Vandermonde
     # matrix and either pinv or lstsq
     X = poly.polyvander(trsf(hgt), n)
     c = np.dot(la.pinv(X), wgt)
-    y = np.dot(poly.polyvander(trsf(x), n), c)
-    plot_data_and_fit(hgt, wgt, x, y,
-                      'meth4: transformed data using Vandermonde',
-                      'vandermonde_transformed.png')
-
-
-if __name__ == '__main__':
-    main()
+    y = np.dot(poly.polyvander(trsf(x),n), c)
+    plot_data_and_fit(hgt, wgt, x, y)

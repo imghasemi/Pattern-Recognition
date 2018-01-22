@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
+Created on Sun Jan 21 17:32:01 2018
+
 @author: canyuce
 """
 
@@ -8,19 +10,20 @@ import numpy as np
 from scipy.cluster.vq import kmeans2
 import matplotlib.pyplot as plt
 import time
+from sklearn.metrics.pairwise import pairwise_distances
 
 # random seed
 random_state = 0
 
 # number of centroids(k)
-n_clusters = 3
+n_clusters = 2
 
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
-debug = False
+debug = True
 
-def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
+def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
     # create a figure and its axes
     fig = plt.figure()
     axs = fig.add_subplot(111)
@@ -38,8 +41,9 @@ def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
     for i in range(n_clusters):
         axs.scatter(x[labels==i], y[labels==i], alpha=0.5, c=colors[i],  
                      edgecolors='none', s=20)
-        axs.scatter(centers[i,0], centers[i,1], c=colors[i],  
-            edgecolors='yellow', s=75, marker='s')       
+        if len(centers):
+            axs.scatter(centers[i,0], centers[i,1], c=colors[i],  
+                edgecolors='yellow', s=75, marker='s')       
     
     # plot the data 
     # axs.plot(X[:,0], X[:,1], 'ro', label='data', alpha=0.4, c=labels)
@@ -64,14 +68,6 @@ def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
                     papertype=None, format='pdf', transparent=False,
                     bbox_inches='tight', pad_inches=0.1)
     plt.close()
-
-def lloyd_kmeans(data):
-    centroid, labels = kmeans2(data, k=n_clusters, minit='points')
-    print '\nlloyd_kmeans(centroids):\n'
-    print centroid
-    # plot clusters
-    plotData2D(data, 'lloyd'+str(int(round(time.time() * 1000)))+'.pdf'
-    , labels, centroid, 'Lloyd\'s Algorithm')
 
 def hartigan_kmeans(data):
     # assign random cluster to data samples
@@ -115,44 +111,29 @@ def hartigan_kmeans(data):
     print '\nhartigan_kmeans(centroids):\n'
     print np.asarray(mu)
     plotData2D(data, 'hartigan'+str(int(round(time.time() * 1000)))+'.pdf',
-               labels, np.asarray(mu), 'Hartigan\'s Algorithm' )    
-
-def macQueen_kmeans(data):
-    mu = np.random.rand(n_clusters, 2)
-    n_i = np.zeros(3)
-   
-    for i in range(data.shape[0]):        
-        # determine winner centroid
-        E = [0]*n_clusters
-        for k in range(n_clusters):
-            E[k] =  (data[i,0] - mu[k,0])**2 + (data[i,1] - mu[k,1])**2 
-
-        # update cluster size and centroid
-        mu_w = np.argsort(E)[0]
-        n_i[mu_w] += 1
-        mu[mu_w] += (1./n_i[mu_w]) * ( data[i] - mu[mu_w] )
-        
-    labels = np.zeros(data.shape[0])
-    # label samples wrt. cluster centers above
-    for i in range(data.shape[0]):        
-        E = [0]*n_clusters
-        for k in range(n_clusters):
-            E[k] =  (data[i,0] - mu[k,0])**2 + (data[i,1] - mu[k,1])**2 
+               labels, np.asarray(mu), 'Hartigan\'s Algorithm' )
     
-        # update cluster size and centroid
-        labels[i] = np.argsort(E)[0]
+def spectral(data):
+    #Spectral clustering
+    beta = 1.
 
-    print '\MacQueen_kmeans(centroids):\n'
-    print np.asarray(mu)
-    plotData2D(data, 'macqueen'+str(int(round(time.time() * 1000)))+'.pdf',
-               labels, mu, 'MacQueen\'s Algorithm' )     
+    S = np.exp(-beta * np.power(pairwise_distances(data, metric='euclidean'),2))
+    D = np.diag(np.sum(S, axis=0))
+    L = D - S
     
-
+    #calculate eigenvalues and eigenvectors
+    w, v = np.linalg.eig(L)
+    
+    #The eigenvector u that corresponds to the second smallest eigenvalue
+    fiedl = v[:,np.argsort(w)[1]] 
+    labels = (fiedl > 0).astype(int)
+    
+    plotData2D(data, 'spectral', labels, [], 'Spectral Clustering' )
+    
+    
+    
 if __name__ == "__main__":
     # read data from file
-    data = np.genfromtxt('data-clustering-1.csv', delimiter=",").T
-    lloyd_kmeans(data)
+    data = np.genfromtxt('data-clustering-2.csv', delimiter=",").T
     hartigan_kmeans(data)
-    macQueen_kmeans(data)
-
-
+    spectral(data)
