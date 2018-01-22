@@ -25,7 +25,7 @@ def plotData2D(X, filename=None, axis=['Weight', 'Height']):
     # set properties of the legend of the plot
     leg = axs.legend(loc='lower right', shadow=True, fancybox=True, numpoints=1)
     leg.get_frame().set_alpha(0.5)
-
+    
     # either show figure on screen or write it to disk
     if filename == None:
         plt.show()

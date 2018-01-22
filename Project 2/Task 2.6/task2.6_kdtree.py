@@ -15,12 +15,12 @@ test_f  = "data2-test.dat"
 # split_method: determines how to compute the split point
 #   'midpoint': split at the midpoint of the data
 #   'median': split at the median of the data
-split_method='midpoint'
+split_method='median'
 
 #   sel_method: determines how to select the splitting dimension
 #       'alternate': alternate between the x and  the y dimension 
 #       'variance': split the data along the dimension of higher variance.
-sel_method='variance'
+sel_method='alternate'
 
 class Node:
     # Node of a kd-tree
@@ -211,7 +211,7 @@ def print_kdtree(root, data, scatter=True, level=range(1,5), returnPlt=False,
         if returnPlt:
             return axs
         if save:
-            filename = 'chart/kdtree_%s_%s_level_%d.pdf'%(split_method,sel_method,i)
+            filename = 'chart/kdtree/kdtree_%s_%s_level_%d.pdf'%(split_method,sel_method,i)
             plt.savefig(filename, facecolor='w', edgecolor='w',
                         papertype=None, format='pdf', transparent=False,
                         bbox_inches='tight', pad_inches=0.1)
@@ -300,7 +300,7 @@ def kd_tree_search(root, test_data, save=False):
                  if s[2]==1 else "blue")
             plt.legend((ll,lo), ('Train', 'Test'), scatterpoints=1)
             
-            filename = 'chart/NN_point_%s_%s_%d.pdf'%(split_method, sel_method, i)
+            filename = 'chart/kdtree/NN_point_%s_%s_%d.pdf'%(split_method, sel_method, i)
             plt.savefig(filename, facecolor='w', edgeclor='w',
                         papertype=None, format='pdf', transparent=False,
                         bbox_inches='tight', pad_inches=0.1)

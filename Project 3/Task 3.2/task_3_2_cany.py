@@ -122,11 +122,11 @@ def spectral(data):
     L = D - S
     
     #calculate eigenvalues and eigenvectors
-    w, v = np.linalg.eig(L)
+    w, v = np.linalg.eigh(L)
     
     #The eigenvector u that corresponds to the second smallest eigenvalue
     fiedl = v[:,np.argsort(w)[1]] 
-    labels = (fiedl > 0).astype(int)
+    labels = (fiedl < 0).astype(int)
     
     plotData2D(data, 'spectral', labels, [], 'Spectral Clustering' )
     
