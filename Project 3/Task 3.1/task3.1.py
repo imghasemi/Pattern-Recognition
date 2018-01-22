@@ -18,14 +18,15 @@ n_clusters = 3
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
-debug = False
+save = True
+benchmark = True
 
 def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
     # create a figure and its axes
     fig = plt.figure()
     axs = fig.add_subplot(111)
     
-    if debug:
+    if save:
         filename = None
     
     # k < 9
@@ -151,8 +152,32 @@ def macQueen_kmeans(data):
 if __name__ == "__main__":
     # read data from file
     data = np.genfromtxt('data-clustering-1.csv', delimiter=",").T
-    lloyd_kmeans(data)
-    hartigan_kmeans(data)
-    macQueen_kmeans(data)
+    
+    if benchmark :
+        bench_m = np.zeros(n_clusters)
+        n_iter = 10
+            
+        start = time.time()
+        for i in xrange(n_iter):
+            lloyd_kmeans(data)
+            done = time.time()
+            bench_m[0] = done - start
+        
+        start = time.time()
+        for i in xrange(n_iter):
+            hartigan_kmeans(data)
+            done = time.time()
+            bench_m[1] = done - start
+            
+        start = time.time()
+        for i in xrange(n_iter):
+            macQueen_kmeans(data)
+            done = time.time()
+            bench_m[2] = done - start
+            
+    else:
+        lloyd_kmeans(data)
+        hartigan_kmeans(data)
+        macQueen_kmeans(data)
 
 

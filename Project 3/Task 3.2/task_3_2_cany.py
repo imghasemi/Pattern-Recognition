@@ -7,7 +7,6 @@ Created on Sun Jan 21 17:32:01 2018
 """
 
 import numpy as np
-from scipy.cluster.vq import kmeans2
 import matplotlib.pyplot as plt
 import time
 from sklearn.metrics.pairwise import pairwise_distances
@@ -21,7 +20,7 @@ n_clusters = 2
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
-debug = False
+debug = True
 
 def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
     # create a figure and its axes
