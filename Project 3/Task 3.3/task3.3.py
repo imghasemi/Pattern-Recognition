@@ -56,20 +56,20 @@ if __name__ == "__main__":
     # These are the projected 2D points for LDA and PCA
 
     # 2D LDA
-    for m, n in zip([1., 2., 3.], ['red', 'blue', 'green']):
+    for m, n in zip([1., 2., 3.], ['green', 'blue', 'red']):
         plt.scatter(finalLDA.T[0][np.where(Y_Label == m)], finalLDA.T[1][np.where(Y_Label == m)], color=n)
         plt.title('LDA Algorithm 2D')
-    plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=3)
+    plt.legend(['Group #1', 'Group #2', 'Group #3'], loc=3)
     plt.savefig('Figure_LDA_2D.pdf', facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
                 bbox_inches='tight', pad_inches=0.1)
     plt.show()
 
     # 2D PCA
-    for m, n in zip([1., 2., 3.], ['red', 'blue', 'green']):
+    for m, n in zip([1., 2., 3.], ['green', 'blue', 'red']):
         plt.scatter(finalPCA.T[0][np.where(Y_Label == m)], finalPCA.T[1][np.where(Y_Label == m)], color=n)
         plt.title('PCA Algorithm 2D')
-    plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=3)
+    plt.legend(['Group #1', 'Group #2', 'Group #3'], loc=3)
     plt.savefig('Figure_PCA_2D.pdf', facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
                 bbox_inches='tight', pad_inches=0.1)
@@ -83,14 +83,26 @@ if __name__ == "__main__":
 
     # -------------------------------------------------------------------------------------------------------------
     # 3D
-    # finalPCA = projectionFunction(X, PCA(X, 3))
+    finalPCA_3D = projectionFunction(X, PCA(X, 3))
+    fig = plt.figure()
+    axs = Axes3D(fig)
+    for m, n in zip([1., 2., 3.], ['green', 'blue', 'red']):
+        axs.scatter3D((finalPCA_3D.T)[0][np.where(Y_Label == m)], (finalPCA_3D.T)[1][np.where(Y_Label == m)],
+                      (finalPCA_3D.T)[2][np.where(Y_Label == m)], color=n)
+    plt.legend(['Group #1', 'Group #2', 'Group #3'], loc=3)
+    plt.title('PCA Algorithm 3D')
+    plt.savefig('Figure_PCA_3D.pdf', facecolor='w', edgecolor='w',
+                papertype=None, format='pdf', transparent=False,
+                bbox_inches='tight', pad_inches=0.1)
+    plt.show()
+
     finalLDA_3D = projectionFunction(X, LDA(X, classLengthArray, 3))
     fig = plt.figure()
     axs = Axes3D(fig)
     for m, n in zip([1., 2., 3.], ['green', 'blue', 'red']):
         axs.scatter3D((finalLDA_3D.T)[0][np.where(Y_Label == m)], (finalLDA_3D.T)[1][np.where(Y_Label == m)],
                       (finalLDA_3D.T)[2][np.where(Y_Label == m)], color=n)
-    plt.legend(['Class 1', 'Class 2', 'Class 3'], loc=4)
+    plt.legend(['Group #1', 'Group #2', 'Group #3'], loc=3)
     plt.title('LDA Algorithm 3D')
     plt.savefig('Figure_LDA_3D.pdf', facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
