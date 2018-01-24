@@ -18,15 +18,27 @@ n_clusters = 3
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
-save = True
-benchmark = True
+# save figure as pdf
+save = False
+
+#benchmark algortihms
+benchmark = False
 
 def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
+    """
+    Plot 2D data
+    :param data: data to be plotted
+    :param filename: file to be written
+    :param labels: estimated labels of data samples
+    :param centers: cluster centers
+    :param title: title of the figure
+    """
+    
     # create a figure and its axes
     fig = plt.figure()
     axs = fig.add_subplot(111)
     
-    if save:
+    if not save:
         filename = None
     
     # k < 9
@@ -67,6 +79,10 @@ def plotData2D(data, filename, labels, centers, title, axis=['x', 'y']):
     plt.close()
 
 def lloyd_kmeans(data):
+    """
+    Compute regular kmeans algorithm
+    :param data: data samples
+    """
     centroid, labels = kmeans2(data, k=n_clusters, minit='points')
     print '\nlloyd_kmeans(centroids):\n'
     print centroid
@@ -75,6 +91,10 @@ def lloyd_kmeans(data):
     , labels, centroid, 'Lloyd\'s Algorithm')
 
 def hartigan_kmeans(data):
+    """
+    Compute hartigan's kmeans algorithm
+    :param data: data points 
+    """
     # assign random cluster to data samples
     labels = np.random.randint(n_clusters, size=data.shape[0])
     
@@ -99,6 +119,7 @@ def hartigan_kmeans(data):
                 labels[i] = k
                 mu[k] = np.mean(data[labels==k], axis=0)
                 
+                # compute energies
                 for n in range(data.shape[0]):
                     E[k] +=  (data[n,0] - mu[labels[n]][0])**2 + (data[n,1] - 
                      mu[labels[n]][1])**2
@@ -119,6 +140,10 @@ def hartigan_kmeans(data):
                labels, np.asarray(mu), 'Hartigan\'s Algorithm' )    
 
 def macQueen_kmeans(data):
+    """
+    Compute macQueen's online kmeans algorithm
+    :param data: data samples
+    """
     mu = np.random.rand(n_clusters, 2)
     n_i = np.zeros(3)
    
@@ -156,7 +181,8 @@ if __name__ == "__main__":
     if benchmark :
         bench_m = np.zeros(n_clusters)
         n_iter = 10
-            
+        
+        # run all algorithms for 10 times for benchmarking.      
         start = time.time()
         for i in xrange(n_iter):
             lloyd_kmeans(data)

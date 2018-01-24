@@ -20,14 +20,23 @@ n_clusters = 2
 # Number of time the k-means algorithm will be run with different centroid seeds
 n_init = 1
 
-debug = True
+# save output figure
+save = False
 
 def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
+    """
+    Plot 2D data
+    :param data: data to be plotted
+    :param filename: file to be written
+    :param labels: estimated labels of data samples
+    :param centers: cluster centers
+    :param title: title of the figure
+    """
     # create a figure and its axes
     fig = plt.figure()
     axs = fig.add_subplot(111)
     
-    if debug:
+    if not save:
         filename = None
     
     # k < 9
@@ -67,8 +76,33 @@ def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
                     papertype=None, format='pdf', transparent=False,
                     bbox_inches='tight', pad_inches=0.1)
     plt.close()
+    
+def spectral(data):
+    """
+    Run spectral clusting algorithm and plot clusters.
+    :param data: samples
+    """
+    #Spectral clustering
+    beta = 1.
+
+    S = np.exp(-beta * np.power(pairwise_distances(data, metric='euclidean'),2))
+    D = np.diag(np.sum(S, axis=0))
+    L = D - S
+    
+    #calculate eigenvalues and eigenvectors
+    w, v = np.linalg.eigh(L)
+    
+    #The eigenvector u corresponding to the second smallest eigenvalue
+    fiedl = v[:,np.argsort(w)[1]] 
+    labels = (fiedl < 0).astype(int)
+    
+    plotData2D(data, 'spectral.pdf', labels, [], 'Spectral Clustering' )
 
 def hartigan_kmeans(data):
+    """
+    Compute hartigan's kmeans algorithm
+    :param data: data points 
+    """
     # assign random cluster to data samples
     labels = np.random.randint(n_clusters, size=data.shape[0])
     
@@ -111,25 +145,6 @@ def hartigan_kmeans(data):
     print np.asarray(mu)
     plotData2D(data, 'hartigan'+str(int(round(time.time() * 1000)))+'.pdf',
                labels, np.asarray(mu), 'Hartigan\'s Algorithm' )
-    
-def spectral(data):
-    #Spectral clustering
-    beta = 1.
-
-    S = np.exp(-beta * np.power(pairwise_distances(data, metric='euclidean'),2))
-    D = np.diag(np.sum(S, axis=0))
-    L = D - S
-    
-    #calculate eigenvalues and eigenvectors
-    w, v = np.linalg.eigh(L)
-    
-    #The eigenvector u that corresponds to the second smallest eigenvalue
-    fiedl = v[:,np.argsort(w)[1]] 
-    labels = (fiedl < 0).astype(int)
-    
-    plotData2D(data, 'spectral.pdf', labels, [], 'Spectral Clustering' )
-    
-    
     
 if __name__ == "__main__":
     # read data from file
