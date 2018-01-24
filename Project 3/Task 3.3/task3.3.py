@@ -90,7 +90,7 @@ if __name__ == "__main__":
         plt.scatter(finalLDA.T[0][np.where(Y_Label == i)],
                     finalLDA.T[1][np.where(Y_Label == i)], color=j)
         plt.title('LDA Algorithm 2D')
-    plt.legend(['Group #1', 'Group #2', 'Group #3'], loc=3)
+    plt.legend(['#1', '#2', '#3'], loc=3)
     plt.savefig('Figure_LDA_2D.pdf', facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
                 bbox_inches='tight', pad_inches=0.1)
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         plt.scatter(finalPCA.T[0][np.where(Y_Label == i)], 
                     finalPCA.T[1][np.where(Y_Label == i)], color=j)
         plt.title('PCA Algorithm 2D')
-    plt.legend(['Group #1', 'Group #2', 'Group #3'], loc=3)
+    plt.legend(['#1', '#2', '#3'], loc=3)
     plt.savefig('Figure_PCA_2D.pdf', facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
                 bbox_inches='tight', pad_inches=0.1)
