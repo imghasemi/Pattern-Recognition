@@ -48,16 +48,20 @@ def predict_and_plot(X, y, clf_tuple):
     Z = clf.predict(np.c_[x1x1.ravel(), x2x2.ravel()])
     print 'this is support vector = ', clf.support_vectors_, ' for ', description
     Z = Z.reshape(x1x1.shape)
-    # axs.contourf(x1x1, x2x2, Z, cmap=plt.cm.coolwarm, alpha=0.5)
     axs.contourf(x1x1, x2x2, Z, colors=('y', 'b'), alpha=0.5)
 
     XY = np.vstack((X.T, y.T)).T
     X_pos = XY[XY[:, 2] > 0][:, 0:2]
     X_neg = XY[XY[:, 2] < 0][:, 0:2]
 
+    # # uncomment to plot svm points
+    # svm_vectors = clf.support_vectors_
+    # plt.plot(svm_vectors[:, 0], svm_vectors[:, 1], 'go', label='svm', alpha=0.5)
+
     # plot data
-    plt.plot(X_pos[:, 0], X_pos[:, 1], 'bo', label='+1 (train data)', alpha=0.5)
-    plt.plot(X_neg[:, 0], X_neg[:, 1], 'yo', label='-1 (train data)', alpha=0.5)
+    plt.plot(X_pos[:, 0], X_pos[:, 1], 'bo', label='+1', alpha=0.5)
+    plt.plot(X_neg[:, 0], X_neg[:, 1], 'yo', label='-1', alpha=0.5)
+    plt.legend(loc="lower right", numpoints=1)
 
     global plot_dir
     output_file = '.'.join([description.replace(' ', '_').
