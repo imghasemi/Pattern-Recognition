@@ -54,7 +54,7 @@ def LDA(X, classLength, nBiggestVector):
     for i in range(len(classMeans)):
         S_B = S_B + classLength[i] * np.outer((classMeans[i] - overalDataMean), (classMeans[i] - overalDataMean))
     # deriving the eig vals and vectors
-    eigenValues, eigenVectors = np.linalg.eigh(np.dot(np.linalg.inv(S_W), S_B))
+    eigenValues, eigenVectors = np.linalg.eigh(np.dot(np.linalg.pinv(S_W), S_B))
     # return n-biggest eigen-vectors
     return eigenVectors.T[np.argpartition(eigenValues, -nBiggestVector)[-nBiggestVector:]]
 
