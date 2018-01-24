@@ -7,7 +7,6 @@ Created on Sun Jan 21 17:32:01 2018
 """
 
 import numpy as np
-from scipy.cluster.vq import kmeans2
 import matplotlib.pyplot as plt
 import time
 from sklearn.metrics.pairwise import pairwise_distances
@@ -122,13 +121,13 @@ def spectral(data):
     L = D - S
     
     #calculate eigenvalues and eigenvectors
-    w, v = np.linalg.eig(L)
+    w, v = np.linalg.eigh(L)
     
     #The eigenvector u that corresponds to the second smallest eigenvalue
     fiedl = v[:,np.argsort(w)[1]] 
-    labels = (fiedl > 0).astype(int)
+    labels = (fiedl < 0).astype(int)
     
-    plotData2D(data, 'spectral', labels, [], 'Spectral Clustering' )
+    plotData2D(data, 'spectral.pdf', labels, [], 'Spectral Clustering' )
     
     
     
