@@ -40,13 +40,14 @@ def predict_and_plot(X, y, clf_tuple):
     description, clf = clf_tuple
     fig = plt.figure()
     axs = fig.add_subplot(111)
-    fig.suptitle(description)
+    # uncomment to add title with description on the plot
+    # fig.suptitle(description)
 
     x1x1, x2x2 = make_mashgrid(X)
     clf.fit(X, y.ravel())
     # cover the plot by colored grid
     Z = clf.predict(np.c_[x1x1.ravel(), x2x2.ravel()])
-    print 'this is support vector = ', clf.support_vectors_, ' for ', description
+    print 'support vector for', description, ' = ', clf.support_vectors_
     Z = Z.reshape(x1x1.shape)
     axs.contourf(x1x1, x2x2, Z, colors=('y', 'b'), alpha=0.5)
 
@@ -54,9 +55,9 @@ def predict_and_plot(X, y, clf_tuple):
     X_pos = XY[XY[:, 2] > 0][:, 0:2]
     X_neg = XY[XY[:, 2] < 0][:, 0:2]
 
-    # # uncomment to plot svm points
-    # svm_vectors = clf.support_vectors_
-    # plt.plot(svm_vectors[:, 0], svm_vectors[:, 1], 'go', label='svm', alpha=0.5)
+    # uncomment to plot svm points
+    svm_vectors = clf.support_vectors_
+    plt.plot(svm_vectors[:, 0], svm_vectors[:, 1], 'go', label='svm', alpha=0.5)
 
     # plot data
     plt.plot(X_pos[:, 0], X_pos[:, 1], 'bo', label='+1', alpha=0.5)
@@ -64,8 +65,8 @@ def predict_and_plot(X, y, clf_tuple):
     plt.legend(loc="lower right", numpoints=1)
 
     global plot_dir
-    output_file = '.'.join([description.replace(' ', '_').
-                            replace(':', ''), 'png'])
+    output_file = '.'.join([description.replace(' ', '_').replace(':', '').
+                           replace('.', '_').replace(',', '_and'), 'png'])
     output_file = '/'.join([plot_dir, output_file])
     plt.savefig(output_file, facecolor='w', edgecolor='w',
                 papertype=None, format='png', transparent=False,
@@ -81,14 +82,16 @@ def svm_prediction(X, y):
     :return:
     """
     clfs = {'linear: c=1.0': svm.SVC(kernel='linear', C=1.0),
-            'rbf: gamma=0.7, C=5.0': svm.SVC(kernel='rbf', gamma=0.7, C=0.5),
+            'linear: c=0.1': svm.SVC(kernel='linear', C=0.1),
+            'linear: c=10.0': svm.SVC(kernel='linear', C=10.0),
+            'rbf: gamma=0.7, C=0.5': svm.SVC(kernel='rbf', gamma=0.7, C=0.5),
             'rbf: gamma=0.7, C=1.0': svm.SVC(kernel='rbf', gamma=0.7, C=1.0),
             'rbf: gamma=0.7, C=2.0': svm.SVC(kernel='rbf', gamma=0.7, C=2.0),
             'rbf: gamma=0.7, C=8.0': svm.SVC(kernel='rbf', gamma=0.7, C=8.0),
             'rbf: gamma=0.5, C=0.1': svm.SVC(kernel='rbf', gamma=0.5, C=0.1),
             'rbf: gamma=0.5, C=1.0': svm.SVC(kernel='rbf', gamma=0.5, C=1.0),
             'rbf: gamma=0.5, C=2.0': svm.SVC(kernel='rbf', gamma=0.5, C=2.0),
-            'rbf: gamma=0.5, C=8.0': svm.SVC(kernel='rbf', gamma=0.5, C=4.0),
+            'rbf: gamma=0.5, C=8.0': svm.SVC(kernel='rbf', gamma=0.5, C=8.0),
             'rbf: gamma=0.5, C=10.0': svm.SVC(kernel='rbf', gamma=0.5, C=10.0),
             'poly: degree=2, C=1.0': svm.SVC(kernel='poly', degree=2, C=1.0),
             'poly: degree=3, C=1.0': svm.SVC(kernel='poly', degree=3, C=1.0),
@@ -96,9 +99,8 @@ def svm_prediction(X, y):
             'poly: degree=3, C=3.0': svm.SVC(kernel='poly', degree=3, C=3.0),
             'poly: degree=3, C=0.1': svm.SVC(kernel='poly', degree=3, C=0.1),
             'poly: degree=4, C=1.0': svm.SVC(kernel='poly', degree=4, C=1.0),
-            'poly: degree=4, C=0.1': svm.SVC(kernel='poly', degree=4,
-                                             C=100.0),
-            'poly: degree=4, C=100.0': svm.SVC(kernel='poly', degree=4, C=0.4),
+            'poly: degree=4, C=0.1': svm.SVC(kernel='poly', degree=4, C=0.1),
+            'poly: degree=4, C=100.0': svm.SVC(kernel='poly', degree=4, C=100),
             'poly: degree=7, C=1.0': svm.SVC(kernel='poly', degree=7, C=1.0),
             'poly: degree=6, C=1.0': svm.SVC(kernel='poly', degree=6, C=1.0),
             }
