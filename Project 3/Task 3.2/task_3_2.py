@@ -21,7 +21,7 @@ n_clusters = 2
 n_init = 1
 
 # save output figure
-save = False
+save = True
 
 def plotData2D(data, filename, labels, centers=[], title=None, axis=['x', 'y']):
     """
@@ -83,7 +83,7 @@ def spectral(data):
     :param data: samples
     """
     #Spectral clustering
-    beta = 1.
+    beta = 2.0
 
     S = np.exp(-beta * np.power(pairwise_distances(data, metric='euclidean'),2))
     D = np.diag(np.sum(S, axis=0))
@@ -96,7 +96,8 @@ def spectral(data):
     fiedl = v[:,np.argsort(w)[1]] 
     labels = (fiedl < 0).astype(int)
     
-    plotData2D(data, 'spectral.pdf', labels, [], 'Spectral Clustering' )
+    plotData2D(data, 'spectral'+str(beta)+'.pdf', labels, [], 
+               'Spectral Clustering(beta='+str(beta)+')' )
 
 def hartigan_kmeans(data):
     """
