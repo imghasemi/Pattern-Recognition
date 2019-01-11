@@ -31,6 +31,13 @@ This Repository is created to push the solutions and discuss about it.
 * Nearest Neighbor Classifier
 * Computing a kD-tree
 
+## Project 3
+* Fun with k-means clustering
+* Spectral Clustering
+* Dimensionality Reduction
+* Non-monotonous Neurons
+* Exploring numerical instabilities
+
 
 ## Useful links
 * [Professor repository for lectures and course materials](https://sites.google.com/site/bitpatternrecognition/home)
